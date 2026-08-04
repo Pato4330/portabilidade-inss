@@ -293,6 +293,7 @@ async function refreshData(){
       if(Array.isArray(arr) && arr.length){
         DATA.length = 0;
         arr.forEach(d=>DATA.push(norm(d)));
+        grouped = groupByClient();
       }
     }
   }catch(e){ /* mantém dados atuais */ }
@@ -471,7 +472,7 @@ function render(){
     Number(c.totalEcoMes)>=min &&
     (tf==='todas' || c.equipe===tf) &&
     (st==='todos' || (st==='pendentes' && !contacted[c.cpf]) || (st==='contatados' && contacted[c.cpf])) &&
-    (!q || normTxt(c.nome).includes(nq) || c.cpf.includes(qd)
+    (!q || normTxt(c.nome).includes(nq) || (qd && c.cpf.includes(qd))
       || c.contracts.some(ct => normTxt(ct.banco).includes(nq) || ct.contrato.toLowerCase().includes(nq) || ct.nb.includes(qd))));
 
   const sortKey = { ecoMes:'totalEcoMes', saldo:'totalSaldo', txAtual:'maxTxAtual', nome:'nome' }[s] || s;
