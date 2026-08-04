@@ -211,6 +211,13 @@ const TEAM_KEY = 'equipe_atual_portabilidade';
 const fmt = n => n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 const tx  = n => n.toFixed(2).replace('.',',')+'%';
 const normTxt = s => String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+const meses = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+const fmtData = s => {
+  if(!s) return '';
+  const p = s.split('-');
+  if(p.length===3) return parseInt(p[2])+' '+meses[parseInt(p[1])-1]+' '+p[0];
+  return s;
+};
 
 const REMOTE = !!(CONFIG.url && CONFIG.anonKey);
 let contacted = {};
@@ -227,7 +234,8 @@ function norm(d){
     pcNova: Number(d.pcnova!=null?d.pcnova:d.pcNova)||0,
     ecoMes: Number(d.ecomes!=null?d.ecomes:d.ecoMes)||0,
     ecoTotal: Number(d.ecototal!=null?d.ecototal:d.ecoTotal)||0,
-    prazo: Number(d.prazo||0), equipe: d.equipe||'', inapto: !!d.inapto
+    prazo: Number(d.prazo||0), equipe: d.equipe||'', inapto: !!d.inapto,
+    dtcontrato: d.dtcontrato||'', erro: d.erro||''
   };
 }
 for(let i=0;i<DATA.length;i++) DATA[i]=norm(DATA[i]);
@@ -477,7 +485,9 @@ function openSidebar(client){
         <div class="sc-item"><div class="sl">Taxa nova</div><div class="sv">${tx(c.txNova)}</div></div>
         <div class="sc-item"><div class="sl">Saldo</div><div class="sv">${fmt(c.saldo)}</div></div>
         <div class="sc-item"><div class="sl">Parcela atual</div><div class="sv">${fmt(c.pcAtual)}</div></div>
+        ${c.dtcontrato ? `<div class="sc-item" style="grid-column:span 2"><div class="sl">Início</div><div class="sv">${fmtData(c.dtcontrato)}</div></div>` : ''}
       </div>
+      ${c.erro ? `<div style="margin-top:8px;padding:8px 10px;border:1px solid rgba(239,68,68,.4);background:rgba(239,68,68,.08);border-radius:8px;font-size:11px;color:#f87171"><b>Incompatível:</b> ${c.erro}</div>` : ''}
       <div class="sc-arrow">
         <span class="old">${fmt(c.pcAtual)}</span><span>&#8594;</span>
         <span class="new">${fmt(c.pcNova)}</span>
@@ -598,6 +608,8 @@ function buildCard(c){
         <div class="ditem"><div class="l">Taxa</div><div class="v">${tx(ct.txAtual)} → ${tx(ct.txNova)}</div></div>
         <div class="ditem"><div class="l">Parcelas</div><div class="v">${ct.rest}/${ct.prazo}</div></div>
         <div class="ditem"><div class="l">Saldo</div><div class="v">${fmt(ct.saldo)}</div></div>
+        ${ct.dtcontrato ? `<div class="ditem" style="grid-column:span 2"><div class="l">Início</div><div class="v">${fmtData(ct.dtcontrato)}</div></div>` : ''}
+        ${ct.erro ? `<div class="ditem" style="grid-column:span 2;border:1px solid rgba(239,68,68,.4);background:rgba(239,68,68,.08)"><div class="l" style="color:#f87171">Incompatível</div><div class="v" style="color:#f87171;font-size:11px">${ct.erro}</div></div>` : ''}
       `).join('')}
     </div>
     <div class="movebar">
