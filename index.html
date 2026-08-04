@@ -314,7 +314,7 @@ async function criarCard(){
   const inp = document.getElementById('cpfInput');
   const btn = document.getElementById('cpfBtn');
   const cpf = inp.value.replace(/\D/g,'');
-  if(cpf.length!==11){ setMsg('CPF inválido — informe 11 dígitos.', 'erro'); return; }
+  if(cpf.length<10 || cpf.length>11){ setMsg('CPF inválido — informe 10 ou 11 dígitos.', 'erro'); return; }
   btn.disabled = true;
   setMsg('Consultando a Pesquisa Resolutiva e calculando no FinantoBank...');
   try{
