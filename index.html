@@ -1,0 +1,245 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portabilidade INSS - QI Tech 1,66%</title>
+<style>
+:root{
+  --bg:#0f1420; --card:#1a2234; --card2:#232e47; --line:#2c3a58;
+  --txt:#e9eef8; --mut:#93a3c0; --acc:#4f8ef7; --ok:#34d399;
+  --okbg:rgba(52,211,153,.14); --okline:rgba(52,211,153,.4);
+  --radius:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:linear-gradient(160deg,#0b0f19,#111827 50%,#141c30);color:var(--txt);font-family:"Segoe UI",system-ui,Arial,sans-serif;min-height:100vh}
+.wrap{max-width:1240px;margin:0 auto;padding:24px 16px 60px}
+.hero{background:linear-gradient(135deg,#1e3c78,#14384a);border:1px solid var(--line);border-radius:20px;padding:24px 28px;margin-bottom:18px}
+.hero h1{font-size:24px}
+.hero p{color:#c4d3ef;margin-top:6px;font-size:14px}
+.badge{display:inline-block;background:var(--okbg);color:var(--ok);border:1px solid var(--okline);border-radius:999px;padding:4px 14px;font-size:13px;margin-top:10px}
+.tools{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:16px}
+.search{flex:1;min-width:220px;position:relative}
+.search input{width:100%;background:var(--card);border:1px solid var(--line);color:var(--txt);border-radius:12px;padding:12px 14px 12px 40px;font-size:14px;outline:none;transition:border .15s}
+.search input:focus{border-color:var(--acc)}
+.search .ic{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--mut);font-size:15px}
+select{background:var(--card);border:1px solid var(--line);color:var(--txt);border-radius:12px;padding:11px 12px;font-size:14px;outline:none;cursor:pointer}
+.cards2{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;align-items:start}
+.pcard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);display:flex;flex-direction:column;transition:border .15s}
+.pcard.open{border-color:var(--acc)}
+.pcard.done{border-color:var(--okline);background:linear-gradient(180deg,rgba(52,211,153,.06),var(--card))}
+.pcard.done .nome::after{content:"CONTATADO";display:inline-block;margin-left:8px;font-size:9px;font-weight:700;letter-spacing:.5px;color:var(--ok);background:var(--okbg);border:1px solid var(--okline);border-radius:6px;padding:2px 6px;vertical-align:2px}
+.phead{padding:16px;cursor:pointer}
+.phead:hover{background:var(--card2)}
+.row1{display:flex;gap:10px;align-items:flex-start}
+.chk{width:20px;height:20px;flex:none;margin-top:2px;accent-color:var(--ok);cursor:pointer}
+.pinfo{flex:1;min-width:0}
+.pinfo .nome{font-size:15px;font-weight:700;line-height:1.25;word-wrap:break-word}
+.pinfo .sub{font-size:12px;color:var(--mut);margin-top:3px}
+.tgl{width:34px;height:34px;flex:none;border-radius:10px;border:1px solid var(--line);background:var(--card2);color:var(--txt);font-size:13px;cursor:pointer;transition:transform .2s}
+.pcard.open .tgl{transform:rotate(180deg)}
+.row2{display:flex;gap:8px;margin-top:12px}
+.mcol{flex:1;background:var(--card2);border-radius:10px;padding:7px 8px;text-align:center}
+.mcol .lbl{font-size:10px;color:var(--mut);text-transform:uppercase;letter-spacing:.4px}
+.mcol .mval{font-size:14px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
+.row3{display:flex;align-items:center;gap:8px;margin-top:12px}
+.old{color:var(--mut);text-decoration:line-through;font-size:13px;white-space:nowrap}
+.arrow{color:var(--acc);font-size:14px}
+.new{color:var(--ok);font-size:16px;font-weight:700;white-space:nowrap}
+.ecobadge{margin-left:auto;background:var(--okbg);border:1px solid var(--okline);color:var(--ok);border-radius:10px;padding:6px 10px;font-weight:700;font-size:13px;text-align:center;white-space:nowrap}
+.ecobadge .l{display:block;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;opacity:.8}
+.pdetails{display:none;padding:4px 16px 16px;border-top:1px dashed var(--line);background:rgba(0,0,0,.12)}
+.pcard.open .pdetails{display:block}
+.dgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.ditem{background:var(--card2);border-radius:10px;padding:9px 10px}
+.ditem .l{font-size:10px;color:var(--mut);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
+.ditem .v{font-size:13px;font-weight:600;font-variant-numeric:tabular-nums}
+.empty{padding:60px;text-align:center;color:var(--mut)}
+footer{margin-top:24px;color:var(--mut);font-size:12px;text-align:center}
+@media(max-width:700px){.cards2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <h1>Portabilidade INSS · QI Tech</h1>
+    <p>Contratos consignados elegíveis — portabilidade a <b>1,66% a.m.</b> · marque os clientes já contatados</p>
+    <span class="badge" id="heroBadge">0 contratos · 0 clientes</span>
+  </div>
+
+  <div class="tools">
+    <div class="search"><span class="ic">&#128269;</span><input id="q" type="text" placeholder="Buscar por nome, CPF, banco ou nº do contrato..."></div>
+    <select id="status">
+      <option value="todos">Status: todos</option>
+      <option value="pendentes">Status: pendentes</option>
+      <option value="contatados">Status: contatados</option>
+    </select>
+    <select id="sort">
+      <option value="ecoMes">Ordenar: economia/mês</option>
+      <option value="saldo">Ordenar: saldo devedor</option>
+      <option value="nome">Ordenar: cliente (A-Z)</option>
+      <option value="txAtual">Ordenar: taxa atual</option>
+    </select>
+    <select id="minEco">
+      <option value="0">Economia mínima: qualquer</option>
+      <option value="5">Economia mínima: R$ 5/mês</option>
+      <option value="10">Economia mínima: R$ 10/mês</option>
+      <option value="20">Economia mínima: R$ 20/mês</option>
+      <option value="50">Economia mínima: R$ 50/mês</option>
+    </select>
+  </div>
+
+  <div class="cards2" id="list"></div>
+  <div class="empty" id="empty" style="display:none">Nenhum contrato encontrado.</div>
+
+  <footer>Dados da Pesquisa Resolutiva (INSS) · Simulação FinantoBank · taxa QI Tech 1,66% a.m. · Contatos sincronizados <span id="syncLabel">no navegador</span></footer>
+</div>
+
+<script>
+const DATA = [];
+const CONFIG = {"anonKey":"","url":""};
+const STORE_KEY = 'contatados_portabilidade_v1';
+const fmt = n => n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const tx  = n => n.toFixed(2).replace('.',',')+'%';
+
+const REMOTE = !!(CONFIG.url && CONFIG.anonKey);
+let contacted = {}; // cpf -> true
+
+function syncLabel(){
+  document.getElementById('syncLabel').textContent = REMOTE ? 'na equipe (online)' : 'somente neste navegador';
+}
+
+async function loadContacted(){
+  if(REMOTE){
+    try{
+      const url = CONFIG.url.replace(/\/$/,'') + '/rest/v1/contatos?select=cpf,contatado';
+      const res = await fetch(url, { headers: {
+        apikey: CONFIG.anonKey,
+        Authorization: 'Bearer ' + CONFIG.anonKey
+      }});
+      if(res.ok){
+        const arr = await res.json();
+        contacted = {};
+        (arr||[]).forEach(r => { if(r.contatado) contacted[r.cpf] = true; });
+        return;
+      }
+    }catch(e){ /* fallback local */ }
+  }
+  try{ contacted = JSON.parse(localStorage.getItem(STORE_KEY)||'{}'); }catch(e){ contacted = {}; }
+}
+
+function saveLocal(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(contacted)); }catch(e){} }
+
+function toggleContact(cpf, checked){
+  if(checked) contacted[cpf] = true; else delete contacted[cpf];
+  saveLocal();
+  if(REMOTE){
+    const url = CONFIG.url.replace(/\/$/,'') + '/rest/v1/contatos';
+    const body = { cpf: cpf, contatado: !!checked, atualizado_em: new Date().toISOString() };
+    try{
+      fetch(url, { method:'POST', headers:{
+        apikey: CONFIG.anonKey,
+        Authorization: 'Bearer ' + CONFIG.anonKey,
+        'Content-Type':'application/json',
+        Prefer: 'resolution=merge-duplicates,return=minimal'
+      }, body: JSON.stringify(body) }).catch(()=>{});
+    }catch(e){}
+  }
+  applyContacted();
+}
+
+function buildCard(d){
+  const el = document.createElement('div');
+  el.className = 'pcard';
+  el.dataset.cpf = d.cpf;
+  el.innerHTML = `
+  <div class="phead">
+    <div class="row1">
+      <input type="checkbox" class="chk" title="Marcar como contatado" aria-label="Contatado">
+      <div class="pinfo">
+        <div class="nome">${d.nome}</div>
+        <div class="sub">${d.banco} · CPF ${d.cpf}</div>
+      </div>
+      <button class="tgl" aria-label="Detalhes">&#9660;</button>
+    </div>
+    <div class="row2">
+      <div class="mcol"><div class="lbl">Saldo</div><div class="mval">${fmt(d.saldo)}</div></div>
+      <div class="mcol"><div class="lbl">Parcelas</div><div class="mval">${d.rest}/${d.prazo}</div></div>
+      <div class="mcol"><div class="lbl">Taxa</div><div class="mval">${tx(d.txAtual)}</div></div>
+    </div>
+    <div class="row3">
+      <div class="old">${fmt(d.pcAtual)}</div>
+      <div class="arrow">&#8594;</div>
+      <div class="new">${fmt(d.pcNova)}</div>
+      <div class="ecobadge"><span class="l">Economia</span>${fmt(d.ecoMes)}</div>
+    </div>
+  </div>
+  <div class="pdetails">
+    <div class="dgrid">
+      <div class="ditem"><div class="l">Nº do benefício (NB)</div><div class="v">${d.nb}</div></div>
+      <div class="ditem"><div class="l">Nº do contrato</div><div class="v">${d.contrato}</div></div>
+      <div class="ditem"><div class="l">Código do banco</div><div class="v">${d.cod}</div></div>
+      <div class="ditem"><div class="l">Parcelas totais</div><div class="v">${d.prazo}</div></div>
+      <div class="ditem"><div class="l">Parcelas restantes</div><div class="v">${d.rest}</div></div>
+      <div class="ditem"><div class="l">Saldo devedor</div><div class="v">${fmt(d.saldo)}</div></div>
+      <div class="ditem"><div class="l">Taxa atual</div><div class="v">${tx(d.txAtual)}</div></div>
+      <div class="ditem"><div class="l">Taxa nova</div><div class="v">${tx(d.txNova)}</div></div>
+      <div class="ditem"><div class="l">Parcela atual</div><div class="v">${fmt(d.pcAtual)}</div></div>
+      <div class="ditem"><div class="l">Parcela nova</div><div class="v">${fmt(d.pcNova)}</div></div>
+      <div class="ditem"><div class="l">Economia mensal</div><div class="v">${fmt(d.ecoMes)}</div></div>
+      <div class="ditem"><div class="l">Economia total</div><div class="v">${fmt(d.ecoTotal)}</div></div>
+    </div>
+  </div>`;
+  const head = el.querySelector('.phead');
+  const tgl  = el.querySelector('.tgl');
+  const chk  = el.querySelector('.chk');
+  chk.onchange = e => toggleContact(d.cpf, e.target.checked);
+  chk.onclick = e => e.stopPropagation();
+  head.onclick = e => { if(e.target!==tgl && e.target!==chk) el.classList.toggle('open'); };
+  tgl.onclick = () => el.classList.toggle('open');
+  return el;
+}
+
+function applyContacted(){
+  document.querySelectorAll('.pcard').forEach(card=>{
+    const chk = card.querySelector('.chk');
+    const on = !!contacted[card.dataset.cpf];
+    chk.checked = on;
+    card.classList.toggle('done', on);
+  });
+}
+
+function render(){
+  const q  = (document.getElementById('q').value||'').toLowerCase();
+  const min = parseFloat(document.getElementById('minEco').value)||0;
+  const s  = document.getElementById('sort').value;
+  const st = document.getElementById('status').value;
+  let rows = DATA.filter(d =>
+    d.ecoMes>=min &&
+    (st==='todos' || (st==='pendentes' && !contacted[d.cpf]) || (st==='contatados' && contacted[d.cpf])) &&
+    (!q || d.nome.toLowerCase().includes(q) || d.cpf.includes(q)
+      || d.banco.toLowerCase().includes(q) || d.contrato.toLowerCase().includes(q)));
+  rows.sort((a,b)=> a[s]<b[s]?-1 : a[s]>b[s]?1 : 0);
+  if(s==='ecoMes'||s==='saldo'||s==='txAtual') rows.reverse();
+
+  const list = document.getElementById('list');
+  list.innerHTML='';
+  rows.forEach(d=>list.appendChild(buildCard(d)));
+  applyContacted();
+  document.getElementById('empty').style.display = rows.length?'none':'block';
+  const nc = Object.keys(contacted).filter(c=>contacted[c]).length;
+  document.getElementById('heroBadge').textContent  = rows.length+' contratos · '+new Set(rows.map(d=>d.cpf)).size+' clientes · '+nc+' contatados';
+}
+document.getElementById('q').addEventListener('input',render);
+document.getElementById('sort').addEventListener('change',render);
+document.getElementById('minEco').addEventListener('change',render);
+document.getElementById('status').addEventListener('change',render);
+
+(async function(){
+  syncLabel();
+  await loadContacted();
+  render();
+})();
+</script>
+</body>
+</html>
