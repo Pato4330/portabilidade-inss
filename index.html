@@ -40,9 +40,11 @@ body{background:linear-gradient(160deg,#0b0f19,#111827 50%,#141c30);color:var(--
 select{background:var(--card);border:1px solid var(--line);color:var(--txt);border-radius:12px;padding:11px 12px;font-size:14px;outline:none;cursor:pointer}
 .cards2{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;align-items:start}
 .pcard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);display:flex;flex-direction:column;transition:border .15s;cursor:pointer}
-.pcard:hover{border-color:var(--acc)}
+.pcard:hover{border-color:var(--acc);border-radius:var(--radius)}
 .pcard.open{border-color:var(--acc)}
 .pcard.done{border-color:var(--okline);background:linear-gradient(180deg,rgba(52,211,153,.06),var(--card))}
+.pcard.inapto{border-color:rgba(239,68,68,.5);background:linear-gradient(180deg,rgba(239,68,68,.08),var(--card))}
+.pcard.inapto .phead:hover{background:rgba(239,68,68,.06)}
 .pcard.done .nome::after{content:"CONTATADO";display:inline-block;margin-left:8px;font-size:9px;font-weight:700;letter-spacing:.5px;color:var(--ok);background:var(--okbg);border:1px solid var(--okline);border-radius:6px;padding:2px 6px;vertical-align:2px}
 .phead{padding:16px}
 .phead:hover{background:var(--card2)}
@@ -78,6 +80,9 @@ select{background:var(--card);border:1px solid var(--line);color:var(--txt);bord
 .movebar select{background:var(--card2);border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:6px 10px;font-size:12px;outline:none;cursor:pointer}
 .movebar select:focus{border-color:var(--acc)}
 .movebar .mvmsg{font-size:11px;color:var(--mut)}
+.inapto-bar{display:flex;align-items:center;gap:8px;margin-top:8px;padding-top:8px;border-top:1px dashed var(--line)}
+.inapto-bar label{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.4px;display:flex;align-items:center;gap:4px;cursor:pointer}
+.inapto-bar input{accent-color:#ef4444;width:16px;height:16px;cursor:pointer}
 .resultsInfo{margin:0 0 10px;font-size:12px;color:var(--mut)}
 .empty{padding:60px;text-align:center;color:var(--mut)}
 footer{margin-top:24px;color:var(--mut);font-size:12px;text-align:center}
@@ -205,7 +210,7 @@ function norm(d){
     pcNova: Number(d.pcnova!=null?d.pcnova:d.pcNova)||0,
     ecoMes: Number(d.ecomes!=null?d.ecomes:d.ecoMes)||0,
     ecoTotal: Number(d.ecototal!=null?d.ecototal:d.ecoTotal)||0,
-    prazo: Number(d.prazo||0), equipe: d.equipe||''
+    prazo: Number(d.prazo||0), equipe: d.equipe||'', inapto: !!d.inapto
   };
 }
 for(let i=0;i<DATA.length;i++) DATA[i]=norm(DATA[i]);
@@ -349,6 +354,26 @@ async function moverCliente(cpf, equipe, msgEl){
   }
 }
 
+async function moverInapto(cpf, inapto, msgEl){
+  if(!REMOTE){ if(msgEl) msgEl.textContent='sem sincronização online'; return; }
+  if(msgEl) msgEl.textContent='salvando...';
+  try{
+    const url = CONFIG.url.replace(/\/$/,'') + '/rest/v1/clientes?cpf=eq.' + encodeURIComponent(cpf);
+    const res = await fetch(url, { method:'PATCH', headers:{
+      apikey: CONFIG.anonKey,
+      Authorization: 'Bearer ' + CONFIG.anonKey,
+      'Content-Type':'application/json',
+      Prefer: 'return=minimal'
+    }, body: JSON.stringify({ inapto: inapto }) });
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    DATA.forEach(d=>{ if(d.cpf===cpf) d.inapto = inapto; });
+    if(msgEl) msgEl.textContent = inapto ? 'inapto ✓' : 'apto ✓';
+    render();
+  }catch(e){
+    if(msgEl) msgEl.textContent = 'erro';
+  }
+}
+
 function openSidebar(client){
   const sb = document.getElementById('sidebar');
   const ov = document.getElementById('overlay');
@@ -358,7 +383,10 @@ function openSidebar(client){
   html += '<div class="sb-section"><h3>Resumo da equipe</h3>';
   html += '<div class="movebar"><label>Mover cliente para:</label>';
   html += '<select id="sbMv"><option value="">— sem equipe —</option><option value="Flavia">Flávia</option><option value="Leda">Leda</option></select>';
-  html += '<span class="mvmsg" id="sbMvMsg"></span></div></div>';
+  html += '<span class="mvmsg" id="sbMvMsg"></span></div>';
+  html += '<div class="inapto-bar"><label><input type="checkbox" id="sbInapto"> Inapto</label>';
+  html += '<span class="mvmsg" id="sbInaptoMsg"></span></div>';
+  html += '</div>';
   html += '<div class="sb-section"><h3>Contratos</h3><div class="sb-contracts">';
   for (const c of client.contracts) {
     html += `<div class="sb-contract">
@@ -384,6 +412,8 @@ function openSidebar(client){
   ov.classList.add('open');
   document.getElementById('sbMv').value = client.equipe || '';
   document.getElementById('sbMv').onchange = e => moverCliente(client.cpf, e.target.value, document.getElementById('sbMvMsg'));
+  document.getElementById('sbInapto').checked = client.inapto || false;
+  document.getElementById('sbInapto').onchange = e => moverInapto(client.cpf, e.target.checked, document.getElementById('sbInaptoMsg'));
 }
 
 function closeSidebar(){
@@ -407,13 +437,14 @@ function groupByClient(){
   const map = new Map();
   for (const d of DATA) {
     if (!map.has(d.cpf)) {
-      map.set(d.cpf, { nome: d.nome, cpf: d.cpf, equipe: d.equipe, contracts: [], totalSaldo: 0, totalEcoMes: 0, totalEcoTotal: 0, count: 0 });
+      map.set(d.cpf, { nome: d.nome, cpf: d.cpf, equipe: d.equipe, inapto: d.inapto || false, contracts: [], totalSaldo: 0, totalEcoMes: 0, totalEcoTotal: 0, maxTxAtual: 0, count: 0 });
     }
     const c = map.get(d.cpf);
     c.contracts.push(d);
     c.totalSaldo += d.saldo;
     c.totalEcoMes += d.ecoMes;
     c.totalEcoTotal += d.ecoTotal;
+    if (d.txAtual > c.maxTxAtual) c.maxTxAtual = d.txAtual;
     c.count++;
   }
   return [...map.values()];
@@ -437,7 +468,12 @@ function render(){
     (!q || normTxt(c.nome).includes(nq) || c.cpf.includes(qd)
       || c.contracts.some(ct => normTxt(ct.banco).includes(nq) || ct.contrato.toLowerCase().includes(nq) || ct.nb.includes(qd))));
 
-  rows.sort((a,b)=> a[s]<b[s]?-1 : a[s]>b[s]?1 : 0);
+  const sortKey = { ecoMes:'totalEcoMes', saldo:'totalSaldo', txAtual:'maxTxAtual', nome:'nome' }[s] || s;
+  rows.sort((a,b)=>{
+    const va = a[sortKey]==='' ? 0 : a[sortKey];
+    const vb = b[sortKey]==='' ? 0 : b[sortKey];
+    return va<vb?-1 : va>vb?1 : 0;
+  });
   if(s==='ecoMes'||s==='saldo'||s==='txAtual') rows.reverse();
 
   const list = document.getElementById('list');
@@ -494,15 +530,29 @@ function buildCard(c){
       </select>
       <span class="mvmsg"></span>
     </div>
+    <div class="inapto-bar">
+      <label><input type="checkbox" class="inapto-chk"> Inapto</label>
+      <span class="mvmsg inapto-msg"></span>
+    </div>
   </div>`;
   const head = el.querySelector('.phead');
   const tgl  = el.querySelector('.tgl');
   const chk  = el.querySelector('.chk');
   const mv   = el.querySelector('.mv');
+  const inaptoChk = el.querySelector('.inapto-chk');
   chk.onchange = e => { e.stopPropagation(); toggleContact(c.cpf, e.target.checked); };
   chk.onclick = e => e.stopPropagation();
   mv.value = c.equipe || '';
   mv.onchange = e => moverCliente(c.cpf, e.target.value, el.querySelector('.mvmsg'));
+  inaptoChk.checked = c.inapto || false;
+  inaptoChk.onchange = async e => {
+    inaptoChk.disabled = true;
+    const msg = el.querySelector('.inapto-msg');
+    if(msg) msg.textContent = 'salvando...';
+    await moverInapto(c.cpf, e.target.checked, msg);
+    inaptoChk.disabled = false;
+  };
+  el.classList.toggle('inapto', c.inapto || false);
   head.onclick = e => { if(e.target!==tgl && e.target!==chk) openSidebar(c); };
   tgl.onclick = () => { tgl.closest('.pcard').classList.toggle('open'); };
   return el;
