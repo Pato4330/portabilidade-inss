@@ -18,6 +18,20 @@ body{background:linear-gradient(160deg,#0b0f19,#111827 50%,#141c30);color:var(--
 .hero h1{font-size:24px}
 .hero p{color:#c4d3ef;margin-top:6px;font-size:14px}
 .badge{display:inline-block;background:var(--okbg);color:var(--ok);border:1px solid var(--okline);border-radius:999px;padding:4px 14px;font-size:13px;margin-top:10px}
+.teamsw{display:flex;gap:8px;margin-top:14px}
+.teamsw button{background:var(--card);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s}
+.teamsw button:hover{border-color:var(--acc)}
+.teamsw button.on{background:var(--okbg);color:var(--ok);border-color:var(--okline)}
+.teamsw .lbl{font-size:12px;color:var(--mut);align-self:center;margin-right:2px}
+.cpfbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px;padding:14px 16px;background:var(--card);border:1px solid var(--line);border-radius:14px}
+.cpfbar label{font-size:13px;font-weight:600;color:var(--mut)}
+.cpfbar input{flex:1;min-width:200px;background:var(--card2);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:11px 12px;font-size:14px;outline:none;font-variant-numeric:tabular-nums}
+.cpfbar input:focus{border-color:var(--acc)}
+.cpfbar button{background:var(--acc);border:none;color:#fff;border-radius:10px;padding:11px 20px;font-size:14px;font-weight:700;cursor:pointer}
+.cpfbar button:disabled{opacity:.5;cursor:wait}
+.cpfbar .msg{width:100%;font-size:12px;color:var(--mut)}
+.cpfbar .msg.ok{color:var(--ok)}
+.cpfbar .msg.erro{color:#f87171}
 .tools{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:16px}
 .search{flex:1;min-width:220px;position:relative}
 .search input{width:100%;background:var(--card);border:1px solid var(--line);color:var(--txt);border-radius:12px;padding:12px 14px 12px 40px;font-size:14px;outline:none;transition:border .15s}
@@ -36,6 +50,9 @@ select{background:var(--card);border:1px solid var(--line);color:var(--txt);bord
 .pinfo{flex:1;min-width:0}
 .pinfo .nome{font-size:15px;font-weight:700;line-height:1.25;word-wrap:break-word}
 .pinfo .sub{font-size:12px;color:var(--mut);margin-top:3px}
+.teamTag{display:inline-block;font-size:9px;font-weight:700;letter-spacing:.4px;border-radius:6px;padding:2px 6px;vertical-align:2px}
+.tagFlavia{color:#c4b5fd;background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.4)}
+.tagLeda{color:#5eead4;background:rgba(45,212,191,.15);border:1px solid rgba(45,212,191,.4)}
 .tgl{width:34px;height:34px;flex:none;border-radius:10px;border:1px solid var(--line);background:var(--card2);color:var(--txt);font-size:13px;cursor:pointer;transition:transform .2s}
 .pcard.open .tgl{transform:rotate(180deg)}
 .row2{display:flex;gap:8px;margin-top:12px}
@@ -63,8 +80,20 @@ footer{margin-top:24px;color:var(--mut);font-size:12px;text-align:center}
 <div class="wrap">
   <div class="hero">
     <h1>Portabilidade INSS · QI Tech</h1>
-    <p>Contratos consignados elegíveis — portabilidade a <b>1,66% a.m.</b> · marque os clientes já contatados</p>
+    <p>Contratos consignados elegíveis — portabilidade a <b>1,66% a.m.</b> · busque um CPF para criar o card e calcular automaticamente</p>
     <span class="badge" id="heroBadge">0 contratos · 0 clientes</span>
+    <div class="teamsw">
+      <span class="lbl">Equipe ativa:</span>
+      <button id="teamFlavia" class="on">Flávia</button>
+      <button id="teamLeda">Leda</button>
+    </div>
+  </div>
+
+  <div class="cpfbar">
+    <label for="cpfInput">Novo card por CPF:</label>
+    <input id="cpfInput" type="text" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" autocomplete="off">
+    <button id="cpfBtn">Buscar e calcular</button>
+    <span class="msg" id="cpfMsg"></span>
   </div>
 
   <div class="tools">
@@ -73,6 +102,11 @@ footer{margin-top:24px;color:var(--mut);font-size:12px;text-align:center}
       <option value="todos">Status: todos</option>
       <option value="pendentes">Status: pendentes</option>
       <option value="contatados">Status: contatados</option>
+    </select>
+    <select id="equipeFiltro">
+      <option value="todas">Equipe: todas</option>
+      <option value="Flavia">Equipe: Flávia</option>
+      <option value="Leda">Equipe: Leda</option>
     </select>
     <select id="sort">
       <option value="ecoMes">Ordenar: economia/mês</option>
@@ -92,22 +126,49 @@ footer{margin-top:24px;color:var(--mut);font-size:12px;text-align:center}
   <div class="cards2" id="list"></div>
   <div class="empty" id="empty" style="display:none">Nenhum contrato encontrado.</div>
 
-  <footer>Dados da Pesquisa Resolutiva (INSS) · Simulação FinantoBank · taxa QI Tech 1,66% a.m. · Contatos sincronizados <span id="syncLabel">no navegador</span></footer>
+  <footer>Dados da Pesquisa Resolutiva (INSS) · Simulação FinantoBank · taxa QI Tech 1,66% a.m. · Contatos e equipe sincronizados <span id="syncLabel">no navegador</span></footer>
 </div>
 
 <script>
 const DATA = [];
-const CONFIG = {"anonKey":"sb_publishable_SP3QjI8oQQL9fFvVFr1UXA_IsfbMtlg","url":"https://fvvrcpqiiygufyovmvwd.supabase.co"};
+const CONFIG = {"funcKey":"BNnu2AQkxr6qO9f1CUdyKbYjRgSPsHFm","url":"https://fvvrcpqiiygufyovmvwd.supabase.co","funcUrl":"https://fvvrcpqiiygufyovmvwd.supabase.co/functions/v1/calcular-cpf","anonKey":"sb_publishable_SP3QjI8oQQL9fFvVFr1UXA_IsfbMtlg"};
 const STORE_KEY = 'contatados_portabilidade_v1';
+const TEAM_KEY = 'equipe_atual_portabilidade';
 const fmt = n => n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 const tx  = n => n.toFixed(2).replace('.',',')+'%';
 
 const REMOTE = !!(CONFIG.url && CONFIG.anonKey);
 let contacted = {}; // cpf -> true
+let currentTeam = (()=>{ try{ return localStorage.getItem(TEAM_KEY)||'Flavia'; }catch(e){ return 'Flavia'; } })();
+
+function norm(d){
+  return {
+    nome: d.nome, cpf: String(d.cpf), nb: String(d.nb), banco: d.banco||'',
+    cod: Number(d.cod)||0, contrato: String(d.contrato||''),
+    saldo: Number(d.saldo||0), rest: Number(d.rest||0),
+    txAtual: Number(d.txatual!=null?d.txatual:d.txAtual)||0,
+    pcAtual: Number(d.pcatual!=null?d.pcatual:d.pcAtual)||0,
+    txNova: Number(d.txnova!=null?d.txnova:d.txNova)||0,
+    pcNova: Number(d.pcnova!=null?d.pcnova:d.pcNova)||0,
+    ecoMes: Number(d.ecomes!=null?d.ecomes:d.ecoMes)||0,
+    ecoTotal: Number(d.ecototal!=null?d.ecototal:d.ecoTotal)||0,
+    prazo: Number(d.prazo||0), equipe: d.equipe||'Flavia'
+  };
+}
+for(let i=0;i<DATA.length;i++) DATA[i]=norm(DATA[i]);
 
 function syncLabel(){
   document.getElementById('syncLabel').textContent = REMOTE ? 'na equipe (online)' : 'somente neste navegador';
 }
+
+function setTeam(t){
+  currentTeam = t;
+  document.getElementById('teamFlavia').classList.toggle('on', t==='Flavia');
+  document.getElementById('teamLeda').classList.toggle('on', t==='Leda');
+  try{ localStorage.setItem(TEAM_KEY, t); }catch(e){}
+}
+document.getElementById('teamFlavia').onclick = ()=>setTeam('Flavia');
+document.getElementById('teamLeda').onclick = ()=>setTeam('Leda');
 
 async function loadContacted(){
   if(REMOTE){
@@ -148,6 +209,64 @@ function toggleContact(cpf, checked){
   applyContacted();
 }
 
+async function refreshData(){
+  if(!REMOTE) return;
+  try{
+    const url = CONFIG.url.replace(/\/$/,'') + '/rest/v1/clientes?select=*&order=nome.asc';
+    const res = await fetch(url, { headers: {
+      apikey: CONFIG.anonKey,
+      Authorization: 'Bearer ' + CONFIG.anonKey
+    }});
+    if(res.ok){
+      const arr = await res.json();
+      if(Array.isArray(arr) && arr.length){
+        DATA.length = 0;
+        arr.forEach(d=>DATA.push(norm(d)));
+      }
+    }
+  }catch(e){ /* mantém dados atuais */ }
+  render();
+}
+
+function setMsg(txt, cls){
+  const m = document.getElementById('cpfMsg');
+  m.textContent = txt;
+  m.className = 'msg' + (cls?' '+cls:'');
+}
+
+async function criarCard(){
+  const inp = document.getElementById('cpfInput');
+  const btn = document.getElementById('cpfBtn');
+  const cpf = inp.value.replace(/\D/g,'');
+  if(cpf.length!==11){ setMsg('CPF inválido — informe 11 dígitos.', 'erro'); return; }
+  btn.disabled = true;
+  setMsg('Consultando a Pesquisa Resolutiva e calculando no FinantoBank...');
+  try{
+    const res = await fetch(CONFIG.funcUrl, {
+      method:'POST',
+      headers: { 'Content-Type':'application/json', 'x-func-key': CONFIG.funcKey },
+      body: JSON.stringify({ cpf: cpf, equipe: currentTeam })
+    });
+    const j = await res.json();
+    if(!res.ok || !j.ok) throw new Error(j.error||'falha na consulta');
+    setMsg(j.nome+' — '+j.total+' contrato(s) adicionado(s) à equipe '+currentTeam+'.', 'ok');
+    inp.value='';
+    await refreshData();
+  }catch(e){
+    setMsg('Erro: '+(e.message||e), 'erro');
+  }finally{
+    btn.disabled = false;
+  }
+}
+document.getElementById('cpfBtn').onclick = criarCard;
+document.getElementById('cpfInput').addEventListener('keydown', e=>{ if(e.key==='Enter') criarCard(); });
+document.getElementById('cpfInput').addEventListener('input', function(){
+  let v = this.value.replace(/\D/g,'').slice(0,11);
+  let out = '';
+  for(let i=0;i<v.length;i++){ if(i===3||i===6) out+='.'; if(i===9) out+='-'; out+=v[i]; }
+  this.value = out;
+});
+
 function buildCard(d){
   const el = document.createElement('div');
   el.className = 'pcard';
@@ -157,7 +276,7 @@ function buildCard(d){
     <div class="row1">
       <input type="checkbox" class="chk" title="Marcar como contatado" aria-label="Contatado">
       <div class="pinfo">
-        <div class="nome">${d.nome}</div>
+        <div class="nome">${d.nome}<span class="teamTag ${d.equipe==='Leda'?'tagLeda':'tagFlavia'}">${d.equipe}</span></div>
         <div class="sub">${d.banco} · CPF ${d.cpf}</div>
       </div>
       <button class="tgl" aria-label="Detalhes">&#9660;</button>
@@ -214,8 +333,10 @@ function render(){
   const min = parseFloat(document.getElementById('minEco').value)||0;
   const s  = document.getElementById('sort').value;
   const st = document.getElementById('status').value;
+  const tf = document.getElementById('equipeFiltro').value;
   let rows = DATA.filter(d =>
     d.ecoMes>=min &&
+    (tf==='todas' || d.equipe===tf) &&
     (st==='todos' || (st==='pendentes' && !contacted[d.cpf]) || (st==='contatados' && contacted[d.cpf])) &&
     (!q || d.nome.toLowerCase().includes(q) || d.cpf.includes(q)
       || d.banco.toLowerCase().includes(q) || d.contrato.toLowerCase().includes(q)));
@@ -234,10 +355,13 @@ document.getElementById('q').addEventListener('input',render);
 document.getElementById('sort').addEventListener('change',render);
 document.getElementById('minEco').addEventListener('change',render);
 document.getElementById('status').addEventListener('change',render);
+document.getElementById('equipeFiltro').addEventListener('change',render);
 
 (async function(){
   syncLabel();
+  setTeam(currentTeam);
   await loadContacted();
+  await refreshData();
   render();
 })();
 </script>
