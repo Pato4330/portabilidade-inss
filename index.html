@@ -169,17 +169,23 @@ function syncLabel(){
   document.getElementById('syncLabel').textContent = REMOTE ? 'na equipe (online)' : 'somente neste navegador';
 }
 
-function setTeam(t){
-  currentTeam = t;
-  document.getElementById('teamFlavia').classList.toggle('on', t==='Flavia');
-  document.getElementById('teamLeda').classList.toggle('on', t==='Leda');
-  const f = document.getElementById('equipeFiltro');
-  if(f.value !== t) f.value = t;
-  try{ localStorage.setItem(TEAM_KEY, t); }catch(e){}
-  render();
+function renderTeam(){
+  document.getElementById('teamFlavia').classList.toggle('on', currentTeam==='Flavia');
+  document.getElementById('teamLeda').classList.toggle('on', currentTeam==='Leda');
 }
-document.getElementById('teamFlavia').onclick = ()=>setTeam('Flavia');
-document.getElementById('teamLeda').onclick = ()=>setTeam('Leda');
+
+function setTeam(t, syncFilter){
+  currentTeam = t;
+  try{ localStorage.setItem(TEAM_KEY, t); }catch(e){}
+  renderTeam();
+  if(syncFilter){
+    const f = document.getElementById('equipeFiltro');
+    if(f.value !== t) f.value = t;
+    render();
+  }
+}
+document.getElementById('teamFlavia').onclick = ()=>setTeam('Flavia', true);
+document.getElementById('teamLeda').onclick = ()=>setTeam('Leda', true);
 
 async function loadContacted(){
   if(REMOTE){
@@ -239,6 +245,8 @@ async function moverCliente(cpf, equipe, msgEl){
     if(msgEl) msgEl.textContent = 'erro: '+(e.message||e);
   }
 }
+
+async function refreshData(){
   if(!REMOTE) return;
   try{
     const url = CONFIG.url.replace(/\/$/,'') + '/rest/v1/clientes?select=*&order=nome.asc';
@@ -402,7 +410,8 @@ document.getElementById('equipeFiltro').addEventListener('change',render);
 
 (async function(){
   syncLabel();
-  setTeam(currentTeam);
+  renderTeam();
+  document.getElementById('equipeFiltro').value = 'todas';
   await loadContacted();
   await refreshData();
   render();
