@@ -526,13 +526,16 @@ function groupByClient(){
   const map = new Map();
   for (const d of DATA) {
     if (!map.has(d.cpf)) {
-      map.set(d.cpf, { nome: d.nome, cpf: d.cpf, equipe: d.equipe, inapto: d.inapto || false, contracts: [], totalSaldo: 0, totalEcoMes: 0, totalEcoTotal: 0, maxTxAtual: 0, count: 0 });
+      map.set(d.cpf, { nome: d.nome, cpf: d.cpf, equipe: d.equipe, inapto: d.inapto || false, contracts: [], totalSaldo: 0, totalEcoMes: 0, totalEcoTotal: 0, maxTxAtual: 0, count: 0, countValid: 0 });
     }
     const c = map.get(d.cpf);
     c.contracts.push(d);
     c.totalSaldo += d.saldo;
-    c.totalEcoMes += d.ecoMes;
-    c.totalEcoTotal += d.ecoTotal;
+    if (!d.erro) {
+      c.totalEcoMes += d.ecoMes;
+      c.totalEcoTotal += d.ecoTotal;
+      c.countValid++;
+    }
     if (d.txAtual > c.maxTxAtual) c.maxTxAtual = d.txAtual;
     c.count++;
   }
@@ -572,8 +575,9 @@ function render(){
   document.getElementById('empty').style.display = rows.length?'none':'block';
   const nc = Object.keys(contacted).filter(c=>contacted[c]).length;
   const totalContracts = rows.reduce((a,c)=>a+c.count,0);
-  document.getElementById('heroBadge').textContent = rows.length+' clientes · '+totalContracts+' contratos · '+nc+' contatados';
-  document.getElementById('resultsInfo').textContent = 'Mostrando '+rows.length+' cliente(s) de '+grouped.length+' · '+totalContracts+' contrato(s)';
+  const totalValid = rows.reduce((a,c)=>a+c.countValid,0);
+  document.getElementById('heroBadge').textContent = rows.length+' clientes · '+totalValid+'/'+totalContracts+' contratos válidos · '+nc+' contatados';
+  document.getElementById('resultsInfo').textContent = 'Mostrando '+rows.length+' cliente(s) de '+grouped.length+' · '+totalValid+'/'+totalContracts+' contrato(s) válido(s)';
 }
 
 function buildCard(c){
@@ -588,7 +592,7 @@ function buildCard(c){
       <input type="checkbox" class="chk" title="Marcar como contatado" aria-label="Contatado">
       <div class="pinfo">
         <div class="nome">${c.nome}${tag}</div>
-        <div class="sub">CPF ${c.cpf} · ${c.count} contrato(s)</div>
+        <div class="sub">CPF ${c.cpf} · ${c.count} contrato(s)${c.countValid < c.count ? ' · '+c.countValid+' válido(s)' : ''}</div>
       </div>
       <button class="tgl" aria-label="Detalhes">&#9660;</button>
     </div>
