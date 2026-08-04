@@ -22,6 +22,7 @@ body{background:linear-gradient(160deg,#0b0f19,#111827 50%,#141c30);color:var(--
 .teamsw button{background:var(--card);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s}
 .teamsw button:hover{border-color:var(--acc)}
 .teamsw button.on{background:var(--okbg);color:var(--ok);border-color:var(--okline)}
+.teamsw #teamNone.on{background:rgba(147,163,192,.14);color:var(--mut);border-color:rgba(147,163,192,.4)}
 .teamsw .lbl{font-size:12px;color:var(--mut);align-self:center;margin-right:2px}
 .cpfbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px;padding:14px 16px;background:var(--card);border:1px solid var(--line);border-radius:14px}
 .cpfbar label{font-size:13px;font-weight:600;color:var(--mut)}
@@ -131,6 +132,7 @@ footer{margin-top:24px;color:var(--mut);font-size:12px;text-align:center}
     <span class="badge" id="heroBadge">0 clientes · 0 contratos</span>
     <div class="teamsw">
       <span class="lbl">Equipe ativa:</span>
+      <button id="teamNone">Nenhuma</button>
       <button id="teamFlavia" class="on">Flávia</button>
       <button id="teamLeda">Leda</button>
     </div>
@@ -224,6 +226,7 @@ function syncLabel(){
 }
 
 function renderTeam(){
+  document.getElementById('teamNone').classList.toggle('on', currentTeam==='');
   document.getElementById('teamFlavia').classList.toggle('on', currentTeam==='Flavia');
   document.getElementById('teamLeda').classList.toggle('on', currentTeam==='Leda');
 }
@@ -238,6 +241,7 @@ function setTeam(t, syncFilter){
     render();
   }
 }
+document.getElementById('teamNone').onclick = ()=>setTeam('', true);
 document.getElementById('teamFlavia').onclick = ()=>setTeam('Flavia', true);
 document.getElementById('teamLeda').onclick = ()=>setTeam('Leda', true);
 
