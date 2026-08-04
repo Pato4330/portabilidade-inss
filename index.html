@@ -40,12 +40,16 @@ body{background:linear-gradient(160deg,#0b0f19,#111827 50%,#141c30);color:var(--
 select{background:var(--card);border:1px solid var(--line);color:var(--txt);border-radius:12px;padding:11px 12px;font-size:14px;outline:none;cursor:pointer}
 .cards2{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;align-items:start}
 .pcard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);display:flex;flex-direction:column;transition:border .15s;cursor:pointer}
-.pcard:hover{border-color:var(--acc);border-radius:var(--radius)}
+.pcard:hover{border-color:var(--acc)}
 .pcard.open{border-color:var(--acc)}
 .pcard.done{border-color:var(--okline);background:linear-gradient(180deg,rgba(52,211,153,.06),var(--card))}
-.pcard.inapto{border-color:rgba(239,68,68,.5);background:linear-gradient(180deg,rgba(239,68,68,.08),var(--card))}
-.pcard.inapto .phead:hover{background:rgba(239,68,68,.06)}
+.pcard.inapto{border:2px solid #ef4444;background:linear-gradient(180deg,rgba(239,68,68,.15),rgba(239,68,68,.05),var(--card))}
+.pcard.inapto:hover{border-color:#ef4444}
+.pcard.inapto .ecobadge{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.4);color:#ef4444}
+.pcard.inapto .ecobadge .l{color:#ef4444}
+.pcard.done.inapto{border-color:#ef4444}
 .pcard.done .nome::after{content:"CONTATADO";display:inline-block;margin-left:8px;font-size:9px;font-weight:700;letter-spacing:.5px;color:var(--ok);background:var(--okbg);border:1px solid var(--okline);border-radius:6px;padding:2px 6px;vertical-align:2px}
+.pcard.inapto .nome::after{content:"INAPTO";display:inline-block;margin-left:8px;font-size:9px;font-weight:700;letter-spacing:.5px;color:#ef4444;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.4);border-radius:6px;padding:2px 6px;vertical-align:2px}
 .phead{padding:16px}
 .phead:hover{background:var(--card2)}
 .row1{display:flex;gap:10px;align-items:flex-start}
