@@ -71,6 +71,12 @@ select{background:var(--card);border:1px solid var(--line);color:var(--txt);bord
 .ditem{background:var(--card2);border-radius:10px;padding:9px 10px}
 .ditem .l{font-size:10px;color:var(--mut);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
 .ditem .v{font-size:13px;font-weight:600;font-variant-numeric:tabular-nums}
+.movebar{display:flex;align-items:center;gap:8px;margin-top:12px;padding-top:10px;border-top:1px dashed var(--line);flex-wrap:wrap}
+.movebar label{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.4px}
+.movebar select{background:var(--card2);border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:6px 10px;font-size:12px;outline:none;cursor:pointer}
+.movebar select:focus{border-color:var(--acc)}
+.movebar .mvmsg{font-size:11px;color:var(--mut)}
+.resultsInfo{margin:0 0 10px;font-size:12px;color:var(--mut)}
 .empty{padding:60px;text-align:center;color:var(--mut)}
 footer{margin-top:24px;color:var(--mut);font-size:12px;text-align:center}
 @media(max-width:700px){.cards2{grid-template-columns:1fr}}
@@ -123,6 +129,7 @@ footer{margin-top:24px;color:var(--mut);font-size:12px;text-align:center}
     </select>
   </div>
 
+  <div class="resultsInfo" id="resultsInfo"></div>
   <div class="cards2" id="list"></div>
   <div class="empty" id="empty" style="display:none">Nenhum contrato encontrado.</div>
 
@@ -136,6 +143,7 @@ const STORE_KEY = 'contatados_portabilidade_v1';
 const TEAM_KEY = 'equipe_atual_portabilidade';
 const fmt = n => n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 const tx  = n => n.toFixed(2).replace('.',',')+'%';
+const normTxt = s => String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
 
 const REMOTE = !!(CONFIG.url && CONFIG.anonKey);
 let contacted = {}; // cpf -> true
@@ -165,7 +173,10 @@ function setTeam(t){
   currentTeam = t;
   document.getElementById('teamFlavia').classList.toggle('on', t==='Flavia');
   document.getElementById('teamLeda').classList.toggle('on', t==='Leda');
+  const f = document.getElementById('equipeFiltro');
+  if(f.value !== t) f.value = t;
   try{ localStorage.setItem(TEAM_KEY, t); }catch(e){}
+  render();
 }
 document.getElementById('teamFlavia').onclick = ()=>setTeam('Flavia');
 document.getElementById('teamLeda').onclick = ()=>setTeam('Leda');
@@ -209,7 +220,25 @@ function toggleContact(cpf, checked){
   applyContacted();
 }
 
-async function refreshData(){
+async function moverCliente(cpf, equipe, msgEl){
+  if(!REMOTE){ if(msgEl) msgEl.textContent='sem sincronização online'; return; }
+  if(msgEl) msgEl.textContent='movendo...';
+  try{
+    const url = CONFIG.url.replace(/\/$/,'') + '/rest/v1/clientes?cpf=eq.' + encodeURIComponent(cpf);
+    const res = await fetch(url, { method:'PATCH', headers:{
+      apikey: CONFIG.anonKey,
+      Authorization: 'Bearer ' + CONFIG.anonKey,
+      'Content-Type':'application/json',
+      Prefer: 'return=minimal'
+    }, body: JSON.stringify({ equipe: equipe }) });
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    DATA.forEach(d=>{ if(d.cpf===cpf) d.equipe = equipe; });
+    if(msgEl) msgEl.textContent = 'ok ✓';
+    render();
+  }catch(e){
+    if(msgEl) msgEl.textContent = 'erro: '+(e.message||e);
+  }
+}
   if(!REMOTE) return;
   try{
     const url = CONFIG.url.replace(/\/$/,'') + '/rest/v1/clientes?select=*&order=nome.asc';
@@ -308,12 +337,23 @@ function buildCard(d){
       <div class="ditem"><div class="l">Economia mensal</div><div class="v">${fmt(d.ecoMes)}</div></div>
       <div class="ditem"><div class="l">Economia total</div><div class="v">${fmt(d.ecoTotal)}</div></div>
     </div>
+    <div class="movebar">
+      <label>Mover cliente para:</label>
+      <select class="mv">
+        <option value="Flavia">Flávia</option>
+        <option value="Leda">Leda</option>
+      </select>
+      <span class="mvmsg"></span>
+    </div>
   </div>`;
   const head = el.querySelector('.phead');
   const tgl  = el.querySelector('.tgl');
   const chk  = el.querySelector('.chk');
+  const mv   = el.querySelector('.mv');
   chk.onchange = e => toggleContact(d.cpf, e.target.checked);
   chk.onclick = e => e.stopPropagation();
+  mv.value = d.equipe;
+  mv.onchange = e => moverCliente(d.cpf, e.target.value, el.querySelector('.mvmsg'));
   head.onclick = e => { if(e.target!==tgl && e.target!==chk) el.classList.toggle('open'); };
   tgl.onclick = () => el.classList.toggle('open');
   return el;
@@ -329,17 +369,19 @@ function applyContacted(){
 }
 
 function render(){
-  const q  = (document.getElementById('q').value||'').toLowerCase();
+  const q  = document.getElementById('q').value||'';
+  const nq = normTxt(q);
+  const qd = q.replace(/\D/g,'');
   const min = parseFloat(document.getElementById('minEco').value)||0;
   const s  = document.getElementById('sort').value;
   const st = document.getElementById('status').value;
   const tf = document.getElementById('equipeFiltro').value;
   let rows = DATA.filter(d =>
-    d.ecoMes>=min &&
+    Number(d.ecoMes)>=min &&
     (tf==='todas' || d.equipe===tf) &&
     (st==='todos' || (st==='pendentes' && !contacted[d.cpf]) || (st==='contatados' && contacted[d.cpf])) &&
-    (!q || d.nome.toLowerCase().includes(q) || d.cpf.includes(q)
-      || d.banco.toLowerCase().includes(q) || d.contrato.toLowerCase().includes(q)));
+    (!q || normTxt(d.nome).includes(nq) || d.cpf.includes(qd)
+      || normTxt(d.banco).includes(nq) || normTxt(d.contrato).includes(nq)));
   rows.sort((a,b)=> a[s]<b[s]?-1 : a[s]>b[s]?1 : 0);
   if(s==='ecoMes'||s==='saldo'||s==='txAtual') rows.reverse();
 
@@ -349,7 +391,8 @@ function render(){
   applyContacted();
   document.getElementById('empty').style.display = rows.length?'none':'block';
   const nc = Object.keys(contacted).filter(c=>contacted[c]).length;
-  document.getElementById('heroBadge').textContent  = rows.length+' contratos · '+new Set(rows.map(d=>d.cpf)).size+' clientes · '+nc+' contatados';
+  document.getElementById('heroBadge').textContent  = DATA.length+' contratos · '+new Set(DATA.map(d=>d.cpf)).size+' clientes · '+nc+' contatados';
+  document.getElementById('resultsInfo').textContent = 'Mostrando '+rows.length+' contrato(s) de '+new Set(rows.map(d=>d.cpf)).size+' cliente(s)';
 }
 document.getElementById('q').addEventListener('input',render);
 document.getElementById('sort').addEventListener('change',render);
