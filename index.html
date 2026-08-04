@@ -351,6 +351,7 @@ async function moverCliente(cpf, equipe, msgEl){
     }, body: JSON.stringify({ equipe: equipe }) });
     if(!res.ok) throw new Error('HTTP '+res.status);
     DATA.forEach(d=>{ if(d.cpf===cpf) d.equipe = equipe; });
+    grouped = groupByClient();
     if(msgEl) msgEl.textContent = 'ok ✓';
     render();
   }catch(e){
@@ -371,6 +372,7 @@ async function moverInapto(cpf, inapto, msgEl){
     }, body: JSON.stringify({ inapto: inapto }) });
     if(!res.ok) throw new Error('HTTP '+res.status);
     DATA.forEach(d=>{ if(d.cpf===cpf) d.inapto = inapto; });
+    grouped = groupByClient();
     if(msgEl) msgEl.textContent = inapto ? 'inapto ✓' : 'apto ✓';
     render();
   }catch(e){
