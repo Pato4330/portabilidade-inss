@@ -39,20 +39,22 @@ body{background:linear-gradient(160deg,#0b0f19,#111827 50%,#141c30);color:var(--
 .search .ic{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--mut);font-size:15px}
 select{background:var(--card);border:1px solid var(--line);color:var(--txt);border-radius:12px;padding:11px 12px;font-size:14px;outline:none;cursor:pointer}
 .cards2{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;align-items:start}
-.pcard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);display:flex;flex-direction:column;transition:border .15s}
+.pcard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);display:flex;flex-direction:column;transition:border .15s;cursor:pointer}
+.pcard:hover{border-color:var(--acc)}
 .pcard.open{border-color:var(--acc)}
 .pcard.done{border-color:var(--okline);background:linear-gradient(180deg,rgba(52,211,153,.06),var(--card))}
 .pcard.done .nome::after{content:"CONTATADO";display:inline-block;margin-left:8px;font-size:9px;font-weight:700;letter-spacing:.5px;color:var(--ok);background:var(--okbg);border:1px solid var(--okline);border-radius:6px;padding:2px 6px;vertical-align:2px}
-.phead{padding:16px;cursor:pointer}
+.phead{padding:16px}
 .phead:hover{background:var(--card2)}
 .row1{display:flex;gap:10px;align-items:flex-start}
 .chk{width:20px;height:20px;flex:none;margin-top:2px;accent-color:var(--ok);cursor:pointer}
 .pinfo{flex:1;min-width:0}
 .pinfo .nome{font-size:15px;font-weight:700;line-height:1.25;word-wrap:break-word}
 .pinfo .sub{font-size:12px;color:var(--mut);margin-top:3px}
-.teamTag{display:inline-block;font-size:9px;font-weight:700;letter-spacing:.4px;border-radius:6px;padding:2px 6px;vertical-align:2px}
+.teamTag{display:inline-block;font-size:9px;font-weight:700;letter-spacing:.4px;border-radius:6px;padding:2px 6px;vertical-align:2px;margin-left:8px}
 .tagFlavia{color:#c4b5fd;background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.4)}
 .tagLeda{color:#5eead4;background:rgba(45,212,191,.15);border:1px solid rgba(45,212,191,.4)}
+.tagNone{color:var(--mut);background:rgba(147,163,192,.1);border:1px solid rgba(147,163,192,.2)}
 .tgl{width:34px;height:34px;flex:none;border-radius:10px;border:1px solid var(--line);background:var(--card2);color:var(--txt);font-size:13px;cursor:pointer;transition:transform .2s}
 .pcard.open .tgl{transform:rotate(180deg)}
 .row2{display:flex;gap:8px;margin-top:12px}
@@ -80,14 +82,44 @@ select{background:var(--card);border:1px solid var(--line);color:var(--txt);bord
 .empty{padding:60px;text-align:center;color:var(--mut)}
 footer{margin-top:24px;color:var(--mut);font-size:12px;text-align:center}
 @media(max-width:700px){.cards2{grid-template-columns:1fr}}
+.sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:90;opacity:0;pointer-events:none;transition:opacity .25s}
+.sidebar-overlay.open{opacity:1;pointer-events:auto}
+.sidebar{position:fixed;top:0;right:0;bottom:0;width:min(520px,100vw);background:var(--bg);border-left:1px solid var(--line);z-index:100;transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow:hidden}
+.sidebar.open{transform:translateX(0)}
+.sidebar-head{padding:20px 24px 16px;border-bottom:1px solid var(--line);display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.sidebar-head h2{font-size:18px;word-wrap:break-word}
+.sidebar-head .sub2{font-size:13px;color:var(--mut);margin-top:4px}
+.sidebar-close{background:none;border:1px solid var(--line);color:var(--txt);border-radius:10px;width:36px;height:36px;font-size:18px;cursor:pointer;flex:none}
+.sidebar-body{flex:1;overflow-y:auto;padding:16px 24px}
+.sb-section{margin-bottom:20px}
+.sb-section h3{font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.sb-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px}
+.sb-row:last-child{border-bottom:none}
+.sb-row .lbl{color:var(--mut)}
+.sb-row .val{font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
+.sb-contracts{display:flex;flex-direction:column;gap:10px}
+.sb-contract{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:12px}
+.sb-contract .sc-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:6px}
+.sb-contract .sc-bank{font-weight:700;font-size:13px}
+.sb-contract .sc-nb{font-size:11px;color:var(--mut)}
+.sb-contract .sc-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.sb-contract .sc-item{background:var(--card2);border-radius:8px;padding:6px 8px}
+.sb-contract .sc-item .sl{font-size:10px;color:var(--mut);text-transform:uppercase;letter-spacing:.3px}
+.sb-contract .sc-item .sv{font-size:12px;font-weight:600;font-variant-numeric:tabular-nums}
+.sb-contract .sc-arrow{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:12px}
+.sb-contract .sc-arrow .old{color:var(--mut);text-decoration:line-through}
+.sb-contract .sc-arrow .new{color:var(--ok);font-weight:700}
+.sb-contract .sc-arrow .eco{color:var(--ok);font-weight:700;margin-left:auto}
+.sb-empty{padding:40px;text-align:center;color:var(--mut)}
+@media(max-width:700px){.sidebar{width:100vw}}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="hero">
     <h1>Portabilidade INSS · QI Tech</h1>
-    <p>Contratos consignados elegíveis — portabilidade a <b>1,66% a.m.</b> · busque um CPF para criar o card e calcular automaticamente</p>
-    <span class="badge" id="heroBadge">0 contratos · 0 clientes</span>
+    <p>Clientes elegíveis — portabilidade a <b>1,66% a.m.</b> · busque um CPF para criar o card e calcular automaticamente</p>
+    <span class="badge" id="heroBadge">0 clientes · 0 contratos</span>
     <div class="teamsw">
       <span class="lbl">Equipe ativa:</span>
       <button id="teamFlavia" class="on">Flávia</button>
@@ -96,7 +128,7 @@ footer{margin-top:24px;color:var(--mut);font-size:12px;text-align:center}
   </div>
 
   <div class="cpfbar">
-    <label for="cpfInput">Novo card por CPF:</label>
+    <label for="cpfInput">Novo cliente por CPF:</label>
     <input id="cpfInput" type="text" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" autocomplete="off">
     <button id="cpfBtn">Buscar e calcular</button>
     <span class="msg" id="cpfMsg"></span>
@@ -113,6 +145,7 @@ footer{margin-top:24px;color:var(--mut);font-size:12px;text-align:center}
       <option value="todas">Equipe: todas</option>
       <option value="Flavia">Equipe: Flávia</option>
       <option value="Leda">Equipe: Leda</option>
+      <option value="">Equipe: sem equipe</option>
     </select>
     <select id="sort">
       <option value="ecoMes">Ordenar: economia/mês</option>
@@ -131,9 +164,21 @@ footer{margin-top:24px;color:var(--mut);font-size:12px;text-align:center}
 
   <div class="resultsInfo" id="resultsInfo"></div>
   <div class="cards2" id="list"></div>
-  <div class="empty" id="empty" style="display:none">Nenhum contrato encontrado.</div>
+  <div class="empty" id="empty" style="display:none">Nenhum cliente encontrado.</div>
 
   <footer>Dados da Pesquisa Resolutiva (INSS) · Simulação FinantoBank · taxa QI Tech 1,66% a.m. · Contatos e equipe sincronizados <span id="syncLabel">no navegador</span></footer>
+</div>
+
+<div class="sidebar-overlay" id="overlay"></div>
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-head">
+    <div>
+      <h2 id="sbName"></h2>
+      <div class="sub2" id="sbSub"></div>
+    </div>
+    <button class="sidebar-close" id="sbClose" aria-label="Fechar">&times;</button>
+  </div>
+  <div class="sidebar-body" id="sbBody"></div>
 </div>
 
 <script>
@@ -146,8 +191,8 @@ const tx  = n => n.toFixed(2).replace('.',',')+'%';
 const normTxt = s => String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
 
 const REMOTE = !!(CONFIG.url && CONFIG.anonKey);
-let contacted = {}; // cpf -> true
-let currentTeam = (()=>{ try{ return localStorage.getItem(TEAM_KEY)||'Flavia'; }catch(e){ return 'Flavia'; } })();
+let contacted = {};
+let currentTeam = (()=>{ try{ return localStorage.getItem(TEAM_KEY)||''; }catch(e){ return ''; } })();
 
 function norm(d){
   return {
@@ -160,7 +205,7 @@ function norm(d){
     pcNova: Number(d.pcnova!=null?d.pcnova:d.pcNova)||0,
     ecoMes: Number(d.ecomes!=null?d.ecomes:d.ecoMes)||0,
     ecoTotal: Number(d.ecototal!=null?d.ecototal:d.ecoTotal)||0,
-    prazo: Number(d.prazo||0), equipe: d.equipe||'Flavia'
+    prazo: Number(d.prazo||0), equipe: d.equipe||''
   };
 }
 for(let i=0;i<DATA.length;i++) DATA[i]=norm(DATA[i]);
@@ -226,26 +271,6 @@ function toggleContact(cpf, checked){
   applyContacted();
 }
 
-async function moverCliente(cpf, equipe, msgEl){
-  if(!REMOTE){ if(msgEl) msgEl.textContent='sem sincronização online'; return; }
-  if(msgEl) msgEl.textContent='movendo...';
-  try{
-    const url = CONFIG.url.replace(/\/$/,'') + '/rest/v1/clientes?cpf=eq.' + encodeURIComponent(cpf);
-    const res = await fetch(url, { method:'PATCH', headers:{
-      apikey: CONFIG.anonKey,
-      Authorization: 'Bearer ' + CONFIG.anonKey,
-      'Content-Type':'application/json',
-      Prefer: 'return=minimal'
-    }, body: JSON.stringify({ equipe: equipe }) });
-    if(!res.ok) throw new Error('HTTP '+res.status);
-    DATA.forEach(d=>{ if(d.cpf===cpf) d.equipe = equipe; });
-    if(msgEl) msgEl.textContent = 'ok ✓';
-    render();
-  }catch(e){
-    if(msgEl) msgEl.textContent = 'erro: '+(e.message||e);
-  }
-}
-
 async function refreshData(){
   if(!REMOTE) return;
   try{
@@ -286,7 +311,7 @@ async function criarCard(){
     });
     const j = await res.json();
     if(!res.ok || !j.ok) throw new Error(j.error||'falha na consulta');
-    setMsg(j.nome+' — '+j.total+' contrato(s) adicionado(s) à equipe '+currentTeam+'.', 'ok');
+    setMsg(j.nome+' — '+j.total+' contrato(s) adicionado(s) à equipe "'+(currentTeam||'sem equipe')+'".', 'ok');
     inp.value='';
     await refreshData();
   }catch(e){
@@ -304,68 +329,70 @@ document.getElementById('cpfInput').addEventListener('input', function(){
   this.value = out;
 });
 
-function buildCard(d){
-  const el = document.createElement('div');
-  el.className = 'pcard';
-  el.dataset.cpf = d.cpf;
-  el.innerHTML = `
-  <div class="phead">
-    <div class="row1">
-      <input type="checkbox" class="chk" title="Marcar como contatado" aria-label="Contatado">
-      <div class="pinfo">
-        <div class="nome">${d.nome}<span class="teamTag ${d.equipe==='Leda'?'tagLeda':'tagFlavia'}">${d.equipe}</span></div>
-        <div class="sub">${d.banco} · CPF ${d.cpf}</div>
-      </div>
-      <button class="tgl" aria-label="Detalhes">&#9660;</button>
-    </div>
-    <div class="row2">
-      <div class="mcol"><div class="lbl">Saldo</div><div class="mval">${fmt(d.saldo)}</div></div>
-      <div class="mcol"><div class="lbl">Parcelas</div><div class="mval">${d.rest}/${d.prazo}</div></div>
-      <div class="mcol"><div class="lbl">Taxa</div><div class="mval">${tx(d.txAtual)}</div></div>
-    </div>
-    <div class="row3">
-      <div class="old">${fmt(d.pcAtual)}</div>
-      <div class="arrow">&#8594;</div>
-      <div class="new">${fmt(d.pcNova)}</div>
-      <div class="ecobadge"><span class="l">Economia</span>${fmt(d.ecoMes)}</div>
-    </div>
-  </div>
-  <div class="pdetails">
-    <div class="dgrid">
-      <div class="ditem"><div class="l">Nº do benefício (NB)</div><div class="v">${d.nb}</div></div>
-      <div class="ditem"><div class="l">Nº do contrato</div><div class="v">${d.contrato}</div></div>
-      <div class="ditem"><div class="l">Código do banco</div><div class="v">${d.cod}</div></div>
-      <div class="ditem"><div class="l">Parcelas totais</div><div class="v">${d.prazo}</div></div>
-      <div class="ditem"><div class="l">Parcelas restantes</div><div class="v">${d.rest}</div></div>
-      <div class="ditem"><div class="l">Saldo devedor</div><div class="v">${fmt(d.saldo)}</div></div>
-      <div class="ditem"><div class="l">Taxa atual</div><div class="v">${tx(d.txAtual)}</div></div>
-      <div class="ditem"><div class="l">Taxa nova</div><div class="v">${tx(d.txNova)}</div></div>
-      <div class="ditem"><div class="l">Parcela atual</div><div class="v">${fmt(d.pcAtual)}</div></div>
-      <div class="ditem"><div class="l">Parcela nova</div><div class="v">${fmt(d.pcNova)}</div></div>
-      <div class="ditem"><div class="l">Economia mensal</div><div class="v">${fmt(d.ecoMes)}</div></div>
-      <div class="ditem"><div class="l">Economia total</div><div class="v">${fmt(d.ecoTotal)}</div></div>
-    </div>
-    <div class="movebar">
-      <label>Mover cliente para:</label>
-      <select class="mv">
-        <option value="Flavia">Flávia</option>
-        <option value="Leda">Leda</option>
-      </select>
-      <span class="mvmsg"></span>
-    </div>
-  </div>`;
-  const head = el.querySelector('.phead');
-  const tgl  = el.querySelector('.tgl');
-  const chk  = el.querySelector('.chk');
-  const mv   = el.querySelector('.mv');
-  chk.onchange = e => toggleContact(d.cpf, e.target.checked);
-  chk.onclick = e => e.stopPropagation();
-  mv.value = d.equipe;
-  mv.onchange = e => moverCliente(d.cpf, e.target.value, el.querySelector('.mvmsg'));
-  head.onclick = e => { if(e.target!==tgl && e.target!==chk) el.classList.toggle('open'); };
-  tgl.onclick = () => el.classList.toggle('open');
-  return el;
+async function moverCliente(cpf, equipe, msgEl){
+  if(!REMOTE){ if(msgEl) msgEl.textContent='sem sincronização online'; return; }
+  if(msgEl) msgEl.textContent='movendo...';
+  try{
+    const url = CONFIG.url.replace(/\/$/,'') + '/rest/v1/clientes?cpf=eq.' + encodeURIComponent(cpf);
+    const res = await fetch(url, { method:'PATCH', headers:{
+      apikey: CONFIG.anonKey,
+      Authorization: 'Bearer ' + CONFIG.anonKey,
+      'Content-Type':'application/json',
+      Prefer: 'return=minimal'
+    }, body: JSON.stringify({ equipe: equipe }) });
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    DATA.forEach(d=>{ if(d.cpf===cpf) d.equipe = equipe; });
+    if(msgEl) msgEl.textContent = 'ok ✓';
+    render();
+  }catch(e){
+    if(msgEl) msgEl.textContent = 'erro: '+(e.message||e);
+  }
 }
+
+function openSidebar(client){
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('overlay');
+  document.getElementById('sbName').textContent = client.nome;
+  document.getElementById('sbSub').textContent = 'CPF '+client.cpf+' · '+client.contracts.length+' contrato(s) · saldo total '+fmt(client.totalSaldo);
+  let html = '';
+  html += '<div class="sb-section"><h3>Resumo da equipe</h3>';
+  html += '<div class="movebar"><label>Mover cliente para:</label>';
+  html += '<select id="sbMv"><option value="">— sem equipe —</option><option value="Flavia">Flávia</option><option value="Leda">Leda</option></select>';
+  html += '<span class="mvmsg" id="sbMvMsg"></span></div></div>';
+  html += '<div class="sb-section"><h3>Contratos</h3><div class="sb-contracts">';
+  for (const c of client.contracts) {
+    html += `<div class="sb-contract">
+      <div class="sc-head"><span class="sc-bank">${c.banco}</span><span class="sc-nb">NB ${c.nb}</span></div>
+      <div class="sc-grid">
+        <div class="sc-item"><div class="sl">Contrato</div><div class="sv">${c.contrato}</div></div>
+        <div class="sc-item"><div class="sl">Parcelas</div><div class="sv">${c.rest}/${c.prazo}</div></div>
+        <div class="sc-item"><div class="sl">Taxa atual</div><div class="sv">${tx(c.txAtual)}</div></div>
+        <div class="sc-item"><div class="sl">Taxa nova</div><div class="sv">${tx(c.txNova)}</div></div>
+        <div class="sc-item"><div class="sl">Saldo</div><div class="sv">${fmt(c.saldo)}</div></div>
+        <div class="sc-item"><div class="sl">Parcela atual</div><div class="sv">${fmt(c.pcAtual)}</div></div>
+      </div>
+      <div class="sc-arrow">
+        <span class="old">${fmt(c.pcAtual)}</span><span>&#8594;</span>
+        <span class="new">${fmt(c.pcNova)}</span>
+        <span class="eco">${fmt(c.ecoMes)}/mês</span>
+      </div>
+    </div>`;
+  }
+  html += '</div></div>';
+  document.getElementById('sbBody').innerHTML = html;
+  sb.classList.add('open');
+  ov.classList.add('open');
+  document.getElementById('sbMv').value = client.equipe || '';
+  document.getElementById('sbMv').onchange = e => moverCliente(client.cpf, e.target.value, document.getElementById('sbMvMsg'));
+}
+
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+}
+document.getElementById('overlay').onclick = closeSidebar;
+document.getElementById('sbClose').onclick = closeSidebar;
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeSidebar(); });
 
 function applyContacted(){
   document.querySelectorAll('.pcard').forEach(card=>{
@@ -376,6 +403,24 @@ function applyContacted(){
   });
 }
 
+function groupByClient(){
+  const map = new Map();
+  for (const d of DATA) {
+    if (!map.has(d.cpf)) {
+      map.set(d.cpf, { nome: d.nome, cpf: d.cpf, equipe: d.equipe, contracts: [], totalSaldo: 0, totalEcoMes: 0, totalEcoTotal: 0, count: 0 });
+    }
+    const c = map.get(d.cpf);
+    c.contracts.push(d);
+    c.totalSaldo += d.saldo;
+    c.totalEcoMes += d.ecoMes;
+    c.totalEcoTotal += d.ecoTotal;
+    c.count++;
+  }
+  return [...map.values()];
+}
+
+let grouped = groupByClient();
+
 function render(){
   const q  = document.getElementById('q').value||'';
   const nq = normTxt(q);
@@ -384,24 +429,85 @@ function render(){
   const s  = document.getElementById('sort').value;
   const st = document.getElementById('status').value;
   const tf = document.getElementById('equipeFiltro').value;
-  let rows = DATA.filter(d =>
-    Number(d.ecoMes)>=min &&
-    (tf==='todas' || d.equipe===tf) &&
-    (st==='todos' || (st==='pendentes' && !contacted[d.cpf]) || (st==='contatados' && contacted[d.cpf])) &&
-    (!q || normTxt(d.nome).includes(nq) || d.cpf.includes(qd)
-      || normTxt(d.banco).includes(nq) || normTxt(d.contrato).includes(nq)));
+
+  let rows = grouped.filter(c =>
+    Number(c.totalEcoMes)>=min &&
+    (tf==='todas' || c.equipe===tf) &&
+    (st==='todos' || (st==='pendentes' && !contacted[c.cpf]) || (st==='contatados' && contacted[c.cpf])) &&
+    (!q || normTxt(c.nome).includes(nq) || c.cpf.includes(qd)
+      || c.contracts.some(ct => normTxt(ct.banco).includes(nq) || ct.contrato.toLowerCase().includes(nq) || ct.nb.includes(qd))));
+
   rows.sort((a,b)=> a[s]<b[s]?-1 : a[s]>b[s]?1 : 0);
   if(s==='ecoMes'||s==='saldo'||s==='txAtual') rows.reverse();
 
   const list = document.getElementById('list');
   list.innerHTML='';
-  rows.forEach(d=>list.appendChild(buildCard(d)));
+  rows.forEach(c=>list.appendChild(buildCard(c)));
   applyContacted();
   document.getElementById('empty').style.display = rows.length?'none':'block';
   const nc = Object.keys(contacted).filter(c=>contacted[c]).length;
-  document.getElementById('heroBadge').textContent  = DATA.length+' contratos · '+new Set(DATA.map(d=>d.cpf)).size+' clientes · '+nc+' contatados';
-  document.getElementById('resultsInfo').textContent = 'Mostrando '+rows.length+' contrato(s) de '+new Set(rows.map(d=>d.cpf)).size+' cliente(s)';
+  const totalContracts = rows.reduce((a,c)=>a+c.count,0);
+  document.getElementById('heroBadge').textContent = rows.length+' clientes · '+totalContracts+' contratos · '+nc+' contatados';
+  document.getElementById('resultsInfo').textContent = 'Mostrando '+rows.length+' cliente(s) de '+grouped.length+' · '+totalContracts+' contrato(s)';
 }
+
+function buildCard(c){
+  const el = document.createElement('div');
+  el.className = 'pcard';
+  el.dataset.cpf = c.cpf;
+  const tag = c.equipe ? `<span class="teamTag ${c.equipe==='Leda'?'tagLeda':'tagFlavia'}">${c.equipe}</span>` :
+              `<span class="teamTag tagNone">sem equipe</span>`;
+  el.innerHTML = `
+  <div class="phead">
+    <div class="row1">
+      <input type="checkbox" class="chk" title="Marcar como contatado" aria-label="Contatado">
+      <div class="pinfo">
+        <div class="nome">${c.nome}${tag}</div>
+        <div class="sub">CPF ${c.cpf} · ${c.count} contrato(s)</div>
+      </div>
+      <button class="tgl" aria-label="Detalhes">&#9660;</button>
+    </div>
+    <div class="row2">
+      <div class="mcol"><div class="lbl">Saldo total</div><div class="mval">${fmt(c.totalSaldo)}</div></div>
+      <div class="mcol"><div class="lbl">Contratos</div><div class="mval">${c.count}</div></div>
+      <div class="mcol"><div class="lbl">Economia/mês</div><div class="mval">${fmt(c.totalEcoMes)}</div></div>
+    </div>
+    <div class="row3">
+      <div class="ecobadge"><span class="l">Economia total</span>${fmt(c.totalEcoTotal)}</div>
+    </div>
+  </div>
+  <div class="pdetails">
+    <div class="dgrid">
+      ${c.contracts.map(ct => `
+        <div class="ditem"><div class="l">${ct.banco} · NB ${ct.nb}</div><div class="v">${ct.contrato}</div></div>
+        <div class="ditem"><div class="l">Taxa</div><div class="v">${tx(ct.txAtual)} → ${tx(ct.txNova)}</div></div>
+        <div class="ditem"><div class="l">Parcelas</div><div class="v">${ct.rest}/${ct.prazo}</div></div>
+        <div class="ditem"><div class="l">Saldo</div><div class="v">${fmt(ct.saldo)}</div></div>
+      `).join('')}
+    </div>
+    <div class="movebar">
+      <label>Mover cliente para:</label>
+      <select class="mv">
+        <option value="">— sem equipe —</option>
+        <option value="Flavia">Flávia</option>
+        <option value="Leda">Leda</option>
+      </select>
+      <span class="mvmsg"></span>
+    </div>
+  </div>`;
+  const head = el.querySelector('.phead');
+  const tgl  = el.querySelector('.tgl');
+  const chk  = el.querySelector('.chk');
+  const mv   = el.querySelector('.mv');
+  chk.onchange = e => { e.stopPropagation(); toggleContact(c.cpf, e.target.checked); };
+  chk.onclick = e => e.stopPropagation();
+  mv.value = c.equipe || '';
+  mv.onchange = e => moverCliente(c.cpf, e.target.value, el.querySelector('.mvmsg'));
+  head.onclick = e => { if(e.target!==tgl && e.target!==chk) openSidebar(c); };
+  tgl.onclick = () => { tgl.closest('.pcard').classList.toggle('open'); };
+  return el;
+}
+
 document.getElementById('q').addEventListener('input',render);
 document.getElementById('sort').addEventListener('change',render);
 document.getElementById('minEco').addEventListener('change',render);
