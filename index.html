@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -8,37 +8,35 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#06090f; --bg2:#0c1120; --card:rgba(15,23,42,.65); --card2:rgba(30,41,59,.55);
+  --bg:#06090f; --bg2:#0c1120; --card:#0f172a; --card2:#1e293b;
   --line:rgba(71,85,105,.35); --txt:#f1f5f9; --mut:#94a3b8; --acc:#6366f1; --acc2:#818cf8;
   --ok:#10b981; --ok2:#34d399; --okbg:rgba(16,185,129,.12); --okline:rgba(16,185,129,.35);
   --danger:#ef4444; --dangerbg:rgba(239,68,68,.1); --dangerline:rgba(239,68,68,.35);
   --purple:#a78bfa; --purplebg:rgba(167,139,250,.12); --purpleline:rgba(167,139,250,.35);
   --teal:#2dd4bf; --tealbg:rgba(45,212,191,.12); --taelline:rgba(45,212,191,.35);
   --radius:16px; --radius-sm:10px;
-  --shadow:0 4px 24px rgba(0,0,0,.3),0 1px 3px rgba(0,0,0,.2);
-  --shadow-lg:0 8px 40px rgba(0,0,0,.4),0 2px 8px rgba(0,0,0,.3);
-  --glass:blur(12px) saturate(1.4);
+  --shadow:0 4px 24px rgba(0,0,0,.3);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);background-image:radial-gradient(ellipse 80% 50% at 50% -20%,rgba(99,102,241,.12),transparent),radial-gradient(ellipse 60% 40% at 80% 100%,rgba(16,185,129,.06),transparent);color:var(--txt);font-family:'Inter',system-ui,-apple-system,sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased}
 .wrap{max-width:1280px;margin:0 auto;padding:28px 20px 60px}
 
-.hero{background:linear-gradient(135deg,rgba(99,102,241,.15),rgba(16,185,129,.08));backdrop-filter:var(--glass);border:1px solid var(--line);border-radius:22px;padding:28px 32px;margin-bottom:20px;position:relative;overflow:hidden}
+.hero{background:linear-gradient(135deg,rgba(99,102,241,.15),rgba(16,185,129,.08));border:1px solid var(--line);border-radius:22px;padding:28px 32px;margin-bottom:20px;position:relative;overflow:hidden}
 .hero::before{content:'';position:absolute;top:-50%;right:-20%;width:400px;height:400px;background:radial-gradient(circle,rgba(99,102,241,.1),transparent 70%);pointer-events:none}
 .hero h1{font-size:26px;font-weight:800;letter-spacing:-.5px;background:linear-gradient(135deg,#f1f5f9,#c7d2fe);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .hero p{color:var(--mut);margin-top:6px;font-size:14px;font-weight:400}
-.badge{display:inline-flex;align-items:center;gap:6px;background:var(--okbg);color:var(--ok2);border:1px solid var(--okline);border-radius:999px;padding:5px 16px;font-size:13px;font-weight:600;margin-top:12px;backdrop-filter:blur(8px)}
-.badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--ok);animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.badge{display:inline-flex;align-items:center;gap:6px;background:var(--okbg);color:var(--ok2);border:1px solid var(--okline);border-radius:999px;padding:5px 16px;font-size:13px;font-weight:600;margin-top:12px;}
+.badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--ok);}
+
 
 .teamsw{display:flex;gap:8px;margin-top:16px}
-.teamsw button{background:rgba(30,41,59,.6);backdrop-filter:blur(8px);border:1px solid var(--line);color:var(--mut);border-radius:var(--radius-sm);padding:8px 20px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit}
+.teamsw button{background:rgba(30,41,59,.6);border:1px solid var(--line);color:var(--mut);border-radius:var(--radius-sm);padding:8px 20px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit}
 .teamsw button:hover{border-color:var(--acc);color:var(--txt);transform:translateY(-1px)}
 .teamsw button.on{background:var(--okbg);color:var(--ok2);border-color:var(--okline);box-shadow:0 0 16px rgba(16,185,129,.15)}
 .teamsw #teamNone.on{background:rgba(148,163,184,.12);color:var(--mut);border-color:rgba(148,163,184,.3);box-shadow:none}
 .teamsw .lbl{font-size:12px;color:var(--mut);align-self:center;margin-right:2px;font-weight:500}
 
-.cpfbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:20px;padding:16px 20px;background:var(--card);backdrop-filter:var(--glass);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.cpfbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:20px;padding:16px 20px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
 .cpfbar label{font-size:13px;font-weight:600;color:var(--mut)}
 .cpfbar input{flex:1;min-width:200px;background:rgba(15,23,42,.6);border:1px solid var(--line);color:var(--txt);border-radius:var(--radius-sm);padding:12px 14px;font-size:14px;outline:none;font-family:inherit;font-variant-numeric:tabular-nums;transition:all .2s}
 .cpfbar input:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(99,102,241,.15)}
@@ -50,27 +48,27 @@ body{background:var(--bg);background-image:radial-gradient(ellipse 80% 50% at 50
 .cpfbar .msg{width:100%;font-size:12px;color:var(--mut);font-weight:500}
 .cpfbar .msg.ok{color:var(--ok2)}
 .cpfbar .msg.erro{color:#f87171}
-.cpfConfirmBox{background:var(--card2);border:1px solid var(--line);border-radius:var(--radius-sm);padding:16px;margin-top:10px;width:100%;backdrop-filter:blur(8px)}
+.cpfConfirmBox{background:var(--card2);border:1px solid var(--line);border-radius:var(--radius-sm);padding:16px;margin-top:10px;width:100%;}
 .cpfConfirmBox .ccName{font-size:16px;font-weight:700;color:var(--txt)}
 .cpfConfirmBox .ccSub{font-size:12px;color:var(--mut);margin-top:4px}
 
 .tools{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:20px}
 .search{flex:1;min-width:240px;position:relative}
-.search input{width:100%;background:var(--card);backdrop-filter:var(--glass);border:1px solid var(--line);color:var(--txt);border-radius:var(--radius);padding:13px 16px 13px 44px;font-size:14px;outline:none;transition:all .2s;font-family:inherit}
+.search input{width:100%;background:var(--card);border:1px solid var(--line);color:var(--txt);border-radius:var(--radius);padding:13px 16px 13px 44px;font-size:14px;outline:none;transition:all .2s;font-family:inherit}
 .search input:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(99,102,241,.15)}
 .search input::placeholder{color:rgba(148,163,184,.5)}
 .search .ic{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--mut);font-size:16px}
-select{background:var(--card);backdrop-filter:var(--glass);border:1px solid var(--line);color:var(--txt);border-radius:var(--radius-sm);padding:12px 14px;font-size:13px;outline:none;cursor:pointer;font-family:inherit;transition:all .2s}
+select{background:var(--card);border:1px solid var(--line);color:var(--txt);border-radius:var(--radius-sm);padding:12px 14px;font-size:13px;outline:none;cursor:pointer;font-family:inherit;transition:all .2s}
 select:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(99,102,241,.15)}
 
 .cards2{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;align-items:start}
-.pcard{background:var(--card);backdrop-filter:var(--glass);border:1px solid var(--line);border-radius:var(--radius);display:flex;flex-direction:column;transition:all .25s cubic-bezier(.4,0,.2,1);cursor:pointer;overflow:hidden;box-shadow:var(--shadow)}
-.pcard:hover{border-color:rgba(99,102,241,.5);transform:translateY(-3px);box-shadow:var(--shadow-lg),0 0 24px rgba(99,102,241,.1)}
-.pcard.open{border-color:var(--acc);box-shadow:var(--shadow-lg),0 0 30px rgba(99,102,241,.15)}
+.pcard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);display:flex;flex-direction:column;transition:all .25s cubic-bezier(.4,0,.2,1);cursor:pointer;overflow:hidden;box-shadow:var(--shadow)}
+.pcard:hover{border-color:rgba(99,102,241,.5);transform:translateY(-3px);box-shadow:var(--shadow)}
+.pcard.open{border-color:var(--acc);box-shadow:var(--shadow)}
 .pcard.done{border-color:var(--okline);background:linear-gradient(180deg,rgba(16,185,129,.08),var(--card))}
-.pcard.done:hover{border-color:var(--ok);box-shadow:var(--shadow-lg),0 0 24px rgba(16,185,129,.1)}
+.pcard.done:hover{border-color:var(--ok);box-shadow:var(--shadow)}
 .pcard.inapto{border:1.5px solid var(--dangerline);background:linear-gradient(180deg,var(--dangerbg),rgba(239,68,68,.03),var(--card))}
-.pcard.inapto:hover{border-color:var(--danger);box-shadow:var(--shadow-lg),0 0 24px rgba(239,68,68,.1)}
+.pcard.inapto:hover{border-color:var(--danger);box-shadow:var(--shadow)}
 .pcard.inapto .ecobadge{background:var(--dangerbg);border-color:var(--dangerline);color:var(--danger)}
 .pcard.inapto .ecobadge .l{color:var(--danger)}
 .pcard.done.inapto{border-color:var(--dangerline)}
@@ -101,8 +99,7 @@ select:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(99,102,241,.15)}
 .old{color:var(--mut);text-decoration:line-through;font-size:13px;white-space:nowrap}
 .arrow{color:var(--acc2);font-size:14px}
 .new{color:var(--ok2);font-size:16px;font-weight:700;white-space:nowrap}
-.ecobadge{margin-left:auto;background:var(--okbg);border:1px solid var(--okline);color:var(--ok2);border-radius:var(--radius-sm);padding:8px 12px;font-weight:700;font-size:13px;text-align:center;white-space:nowrap;backdrop-filter:blur(6px)}
-.ecobadge .l{display:block;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;opacity:.8;margin-bottom:2px}
+.ecobadge{margin-left:auto;background:var(--okbg);border:1px solid var(--okline);color:var(--ok2);border-radius:var(--radius-sm);padding:8px 12px;font-weight:700;font-size:13px;text-align:center;white-space:nowrap;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;opacity:.8;margin-bottom:2px}
 
 .pdetails{display:none;padding:6px 18px 18px;border-top:1px dashed var(--line);background:rgba(0,0,0,.15);border-radius:0 0 var(--radius) var(--radius)}
 .pcard.open .pdetails{display:block;animation:slideDown .25s ease}
@@ -129,7 +126,7 @@ footer{margin-top:32px;color:rgba(148,163,184,.5);font-size:11px;text-align:cent
 
 @media(max-width:700px){.cards2{grid-template-columns:1fr}.hero{padding:20px}.hero h1{font-size:20px}}
 
-.sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:90;opacity:0;pointer-events:none;transition:opacity .3s}
+.sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:90;opacity:0;pointer-events:none;transition:opacity .3s}
 .sidebar-overlay.open{opacity:1;pointer-events:auto}
 .sidebar{position:fixed;top:0;right:0;bottom:0;width:min(520px,100vw);background:var(--bg2);border-left:1px solid var(--line);z-index:100;transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow:hidden;box-shadow:-8px 0 40px rgba(0,0,0,.4)}
 .sidebar.open{transform:translateX(0)}
@@ -146,7 +143,7 @@ footer{margin-top:32px;color:rgba(148,163,184,.5);font-size:11px;text-align:cent
 .sb-row .lbl{color:var(--mut);font-weight:500}
 .sb-row .val{font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
 .sb-contracts{display:flex;flex-direction:column;gap:12px}
-.sb-contract{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;backdrop-filter:blur(8px);transition:border-color .2s}
+.sb-contract{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;transition:border-color .2s}
 .sb-contract:hover{border-color:rgba(99,102,241,.4)}
 .sb-contract .sc-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px}
 .sb-contract .sc-bank{font-weight:700;font-size:13px;letter-spacing:-.2px}
@@ -166,13 +163,13 @@ footer{margin-top:32px;color:rgba(148,163,184,.5);font-size:11px;text-align:cent
 <body>
 <div class="wrap">
   <div class="hero">
-    <h1>Portabilidade INSS · QI Tech</h1>
-    <p>Clientes elegíveis — portabilidade a <b>1,66% a.m.</b> · busque um CPF para criar o card e calcular automaticamente</p>
-    <span class="badge" id="heroBadge">0 clientes · 0 contratos</span>
+    <h1>Portabilidade INSS � QI Tech</h1>
+    <p>Clientes eleg�veis � portabilidade a <b>1,66% a.m.</b> � busque um CPF para criar o card e calcular automaticamente</p>
+    <span class="badge" id="heroBadge">0 clientes � 0 contratos</span>
     <div class="teamsw">
       <span class="lbl">Equipe ativa:</span>
       <button id="teamNone">Nenhuma</button>
-      <button id="teamFlavia" class="on">Flávia</button>
+      <button id="teamFlavia" class="on">Fl�via</button>
       <button id="teamLeda">Leda</button>
     </div>
   </div>
@@ -193,7 +190,7 @@ footer{margin-top:32px;color:rgba(148,163,184,.5);font-size:11px;text-align:cent
   </div>
 
   <div class="tools">
-    <div class="search"><span class="ic">&#128269;</span><input id="q" type="text" placeholder="Buscar por nome, CPF, banco ou nº do contrato..."></div>
+    <div class="search"><span class="ic">&#128269;</span><input id="q" type="text" placeholder="Buscar por nome, CPF, banco ou n� do contrato..."></div>
     <select id="status">
       <option value="todos">Status: todos</option>
       <option value="pendentes">Status: pendentes</option>
@@ -201,22 +198,22 @@ footer{margin-top:32px;color:rgba(148,163,184,.5);font-size:11px;text-align:cent
     </select>
     <select id="equipeFiltro">
       <option value="todas">Equipe: todas</option>
-      <option value="Flavia">Equipe: Flávia</option>
+      <option value="Flavia">Equipe: Fl�via</option>
       <option value="Leda">Equipe: Leda</option>
       <option value="">Equipe: sem equipe</option>
     </select>
     <select id="sort">
-      <option value="ecoMes">Ordenar: economia/mês</option>
+      <option value="ecoMes">Ordenar: economia/m�s</option>
       <option value="saldo">Ordenar: saldo devedor</option>
       <option value="nome">Ordenar: cliente (A-Z)</option>
       <option value="txAtual">Ordenar: taxa atual</option>
     </select>
     <select id="minEco">
-      <option value="0">Economia mínima: qualquer</option>
-      <option value="5">Economia mínima: R$ 5/mês</option>
-      <option value="10">Economia mínima: R$ 10/mês</option>
-      <option value="20">Economia mínima: R$ 20/mês</option>
-      <option value="50">Economia mínima: R$ 50/mês</option>
+      <option value="0">Economia m�nima: qualquer</option>
+      <option value="5">Economia m�nima: R$ 5/m�s</option>
+      <option value="10">Economia m�nima: R$ 10/m�s</option>
+      <option value="20">Economia m�nima: R$ 20/m�s</option>
+      <option value="50">Economia m�nima: R$ 50/m�s</option>
     </select>
   </div>
 
@@ -224,7 +221,7 @@ footer{margin-top:32px;color:rgba(148,163,184,.5);font-size:11px;text-align:cent
   <div class="cards2" id="list"></div>
   <div class="empty" id="empty" style="display:none">Nenhum cliente encontrado.</div>
 
-  <footer>Dados da Pesquisa Resolutiva (INSS) · Simulação FinantoBank · taxa QI Tech 1,66% a.m. · Contatos e equipe sincronizados <span id="syncLabel">no navegador</span></footer>
+  <footer>Dados da Pesquisa Resolutiva (INSS) � Simula��o FinantoBank � taxa QI Tech 1,66% a.m. � Contatos e equipe sincronizados <span id="syncLabel">no navegador</span></footer>
 </div>
 
 <div class="sidebar-overlay" id="overlay"></div>
@@ -355,7 +352,7 @@ async function refreshData(){
         grouped = groupByClient();
       }
     }
-  }catch(e){ /* mantém dados atuais */ }
+  }catch(e){ /* mant�m dados atuais */ }
   render();
 }
 
@@ -373,7 +370,7 @@ async function buscarCliente(){
   const cBtn = document.getElementById('cpfBtn');
   const confirm = document.getElementById('cpfConfirm');
   const valor = inp.value.replace(/\D/g,'');
-  if(valor.length<8 || valor.length>11){ setMsg('Informe um CPF (10-11 dígitos) ou telefone (8-11 dígitos).', 'erro'); return; }
+  if(valor.length<8 || valor.length>11){ setMsg('Informe um CPF (10-11 d�gitos) ou telefone (8-11 d�gitos).', 'erro'); return; }
   sBtn.disabled = true;
   setMsg('Consultando a Pesquisa Resolutiva...');
   confirm.style.display = 'none';
@@ -389,7 +386,7 @@ async function buscarCliente(){
     lastSearch = { cpf: j.cpf, valor: valor, contratos: j.contratos };
     document.getElementById('cpfConfirmInfo').innerHTML =
       '<div class="ccName">'+j.nome+'</div>' +
-      '<div class="ccSub">CPF '+j.cpf+' · '+j.total+' contrato(s) encontrado(s)</div>';
+      '<div class="ccSub">CPF '+j.cpf+' � '+j.total+' contrato(s) encontrado(s)</div>';
     confirm.style.display = 'block';
     cBtn.style.display = 'inline-block';
     setMsg('');
@@ -417,8 +414,8 @@ async function calcularCard(){
       body: JSON.stringify({ cpf: lastSearch.cpf, equipe: currentTeam })
     });
     const j = await res.json();
-    if(!res.ok || !j.ok) throw new Error(j.error||'falha no cálculo');
-    setMsg(j.nome+' — '+j.total+' contrato(s) adicionado(s).', 'ok');
+    if(!res.ok || !j.ok) throw new Error(j.error||'falha no c�lculo');
+    setMsg(j.nome+' � '+j.total+' contrato(s) adicionado(s).', 'ok');
     inp.value='';
     cBtn.style.display = 'none';
     lastSearch = null;
@@ -456,7 +453,7 @@ document.getElementById('cpfInput').addEventListener('input', function(){
 });
 
 async function moverCliente(cpf, equipe, msgEl){
-  if(!REMOTE){ if(msgEl) msgEl.textContent='sem sincronização online'; return; }
+  if(!REMOTE){ if(msgEl) msgEl.textContent='sem sincroniza��o online'; return; }
   if(msgEl) msgEl.textContent='movendo...';
   try{
     const url = CONFIG.url.replace(/\/$/,'') + '/rest/v1/clientes?cpf=eq.' + encodeURIComponent(cpf);
@@ -469,7 +466,7 @@ async function moverCliente(cpf, equipe, msgEl){
     if(!res.ok) throw new Error('HTTP '+res.status);
     DATA.forEach(d=>{ if(d.cpf===cpf) d.equipe = equipe; });
     grouped = groupByClient();
-    if(msgEl) msgEl.textContent = 'ok ✓';
+    if(msgEl) msgEl.textContent = 'ok ?';
     render();
   }catch(e){
     if(msgEl) msgEl.textContent = 'erro: '+(e.message||e);
@@ -477,7 +474,7 @@ async function moverCliente(cpf, equipe, msgEl){
 }
 
 async function moverInapto(cpf, inapto, msgEl){
-  if(!REMOTE){ if(msgEl) msgEl.textContent='sem sincronização online'; return; }
+  if(!REMOTE){ if(msgEl) msgEl.textContent='sem sincroniza��o online'; return; }
   if(msgEl) msgEl.textContent='salvando...';
   try{
     const url = CONFIG.url.replace(/\/$/,'') + '/rest/v1/clientes?cpf=eq.' + encodeURIComponent(cpf);
@@ -490,7 +487,7 @@ async function moverInapto(cpf, inapto, msgEl){
     if(!res.ok) throw new Error('HTTP '+res.status);
     DATA.forEach(d=>{ if(d.cpf===cpf) d.inapto = inapto; });
     grouped = groupByClient();
-    if(msgEl) msgEl.textContent = inapto ? 'inapto ✓' : 'apto ✓';
+    if(msgEl) msgEl.textContent = inapto ? 'inapto ?' : 'apto ?';
     render();
   }catch(e){
     if(msgEl) msgEl.textContent = 'erro';
@@ -501,11 +498,11 @@ function openSidebar(client){
   const sb = document.getElementById('sidebar');
   const ov = document.getElementById('overlay');
   document.getElementById('sbName').textContent = client.nome;
-  document.getElementById('sbSub').textContent = 'CPF '+client.cpf+' · '+client.contracts.length+' contrato(s) · saldo total '+fmt(client.totalSaldo);
+  document.getElementById('sbSub').textContent = 'CPF '+client.cpf+' � '+client.contracts.length+' contrato(s) � saldo total '+fmt(client.totalSaldo);
   let html = '';
   html += '<div class="sb-section"><h3>Resumo da equipe</h3>';
   html += '<div class="movebar"><label>Mover cliente para:</label>';
-  html += '<select id="sbMv"><option value="">— sem equipe —</option><option value="Flavia">Flávia</option><option value="Leda">Leda</option></select>';
+  html += '<select id="sbMv"><option value="">� sem equipe �</option><option value="Flavia">Fl�via</option><option value="Leda">Leda</option></select>';
   html += '<span class="mvmsg" id="sbMvMsg"></span></div>';
   html += '<div class="inapto-bar"><label><input type="checkbox" id="sbInapto"> Inapto</label>';
   html += '<span class="mvmsg" id="sbInaptoMsg"></span></div>';
@@ -521,13 +518,13 @@ function openSidebar(client){
         <div class="sc-item"><div class="sl">Taxa nova</div><div class="sv">${tx(c.txNova)}</div></div>
         <div class="sc-item"><div class="sl">Saldo</div><div class="sv">${fmt(c.saldo)}</div></div>
         <div class="sc-item"><div class="sl">Parcela atual</div><div class="sv">${fmt(c.pcAtual)}</div></div>
-        ${c.dtcontrato ? `<div class="sc-item" style="grid-column:span 2"><div class="sl">Início</div><div class="sv">${fmtData(c.dtcontrato)}</div></div>` : ''}
+        ${c.dtcontrato ? `<div class="sc-item" style="grid-column:span 2"><div class="sl">In�cio</div><div class="sv">${fmtData(c.dtcontrato)}</div></div>` : ''}
       </div>
-      ${c.erro ? `<div style="margin-top:8px;padding:8px 10px;border:1px solid rgba(239,68,68,.4);background:rgba(239,68,68,.08);border-radius:8px;font-size:11px;color:#f87171"><b>Incompatível:</b> ${c.erro}</div>` : ''}
+      ${c.erro ? `<div style="margin-top:8px;padding:8px 10px;border:1px solid rgba(239,68,68,.4);background:rgba(239,68,68,.08);border-radius:8px;font-size:11px;color:#f87171"><b>Incompat�vel:</b> ${c.erro}</div>` : ''}
       <div class="sc-arrow">
         <span class="old">${fmt(c.pcAtual)}</span><span>&#8594;</span>
         <span class="new">${fmt(c.pcNova)}</span>
-        <span class="eco">${fmt(c.ecoMes)}/mês</span>
+        <span class="eco">${fmt(c.ecoMes)}/m�s</span>
       </div>
     </div>`;
   }
@@ -612,8 +609,8 @@ function render(){
   const nc = Object.keys(contacted).filter(c=>contacted[c]).length;
   const totalContracts = rows.reduce((a,c)=>a+c.count,0);
   const totalValid = rows.reduce((a,c)=>a+c.countValid,0);
-  document.getElementById('heroBadge').textContent = rows.length+' clientes · '+totalValid+'/'+totalContracts+' contratos válidos · '+nc+' contatados';
-  document.getElementById('resultsInfo').textContent = 'Mostrando '+rows.length+' cliente(s) de '+grouped.length+' · '+totalValid+'/'+totalContracts+' contrato(s) válido(s)';
+  document.getElementById('heroBadge').textContent = rows.length+' clientes � '+totalValid+'/'+totalContracts+' contratos v�lidos � '+nc+' contatados';
+  document.getElementById('resultsInfo').textContent = 'Mostrando '+rows.length+' cliente(s) de '+grouped.length+' � '+totalValid+'/'+totalContracts+' contrato(s) v�lido(s)';
 }
 
 function buildCard(c){
@@ -628,14 +625,14 @@ function buildCard(c){
       <input type="checkbox" class="chk" title="Marcar como contatado" aria-label="Contatado">
       <div class="pinfo">
         <div class="nome">${c.nome}${tag}</div>
-        <div class="sub">CPF ${c.cpf} · ${c.count} contrato(s)${c.countValid < c.count ? ' · '+c.countValid+' válido(s)' : ''}</div>
+        <div class="sub">CPF ${c.cpf} � ${c.count} contrato(s)${c.countValid < c.count ? ' � '+c.countValid+' v�lido(s)' : ''}</div>
       </div>
       <button class="tgl" aria-label="Detalhes">&#9660;</button>
     </div>
     <div class="row2">
       <div class="mcol"><div class="lbl">Saldo total</div><div class="mval">${fmt(c.totalSaldo)}</div></div>
       <div class="mcol"><div class="lbl">Contratos</div><div class="mval">${c.count}</div></div>
-      <div class="mcol"><div class="lbl">Economia/mês</div><div class="mval">${fmt(c.totalEcoMes)}</div></div>
+      <div class="mcol"><div class="lbl">Economia/m�s</div><div class="mval">${fmt(c.totalEcoMes)}</div></div>
     </div>
     <div class="row3">
       <div class="ecobadge"><span class="l">Economia total</span>${fmt(c.totalEcoTotal)}</div>
@@ -644,19 +641,19 @@ function buildCard(c){
   <div class="pdetails">
     <div class="dgrid">
       ${c.contracts.map(ct => `
-        <div class="ditem"><div class="l">${ct.banco} · NB ${ct.nb}</div><div class="v">${ct.contrato}</div></div>
-        <div class="ditem"><div class="l">Taxa</div><div class="v">${tx(ct.txAtual)} → ${tx(ct.txNova)}</div></div>
+        <div class="ditem"><div class="l">${ct.banco} � NB ${ct.nb}</div><div class="v">${ct.contrato}</div></div>
+        <div class="ditem"><div class="l">Taxa</div><div class="v">${tx(ct.txAtual)} ? ${tx(ct.txNova)}</div></div>
         <div class="ditem"><div class="l">Parcelas</div><div class="v">${ct.rest}/${ct.prazo}</div></div>
         <div class="ditem"><div class="l">Saldo</div><div class="v">${fmt(ct.saldo)}</div></div>
-        ${ct.dtcontrato ? `<div class="ditem" style="grid-column:span 2"><div class="l">Início</div><div class="v">${fmtData(ct.dtcontrato)}</div></div>` : ''}
-        ${ct.erro ? `<div class="ditem" style="grid-column:span 2;border:1px solid rgba(239,68,68,.4);background:rgba(239,68,68,.08)"><div class="l" style="color:#f87171">Incompatível</div><div class="v" style="color:#f87171;font-size:11px">${ct.erro}</div></div>` : ''}
+        ${ct.dtcontrato ? `<div class="ditem" style="grid-column:span 2"><div class="l">In�cio</div><div class="v">${fmtData(ct.dtcontrato)}</div></div>` : ''}
+        ${ct.erro ? `<div class="ditem" style="grid-column:span 2;border:1px solid rgba(239,68,68,.4);background:rgba(239,68,68,.08)"><div class="l" style="color:#f87171">Incompat�vel</div><div class="v" style="color:#f87171;font-size:11px">${ct.erro}</div></div>` : ''}
       `).join('')}
     </div>
     <div class="movebar">
       <label>Mover cliente para:</label>
       <select class="mv">
-        <option value="">— sem equipe —</option>
-        <option value="Flavia">Flávia</option>
+        <option value="">� sem equipe �</option>
+        <option value="Flavia">Fl�via</option>
         <option value="Leda">Leda</option>
       </select>
       <span class="mvmsg"></span>
