@@ -233,6 +233,7 @@ footer{margin-top:32px;color:rgba(148,163,184,.5);font-size:11px;text-align:cent
 </div>
 
 <script>
+window.onerror=function(m,s,l,c,e){document.title='ERR:'+m+' L'+c;console.error('JS ERROR:',m,'line',c,'col',e)};
 const DATA = [];
 const CONFIG = {"funcKey":"BNnu2AQkxr6qO9f1CUdyKbYjRgSPsHFm","url":"https://fvvrcpqiiygufyovmvwd.supabase.co","funcUrl":"https://fvvrcpqiiygufyovmvwd.supabase.co/functions/v1/calcular-cpf","buscarUrl":"https://fvvrcpqiiygufyovmvwd.supabase.co/functions/v1/buscar-telefone","anonKey":"sb_publishable_SP3QjI8oQQL9fFvVFr1UXA_IsfbMtlg"};
 const STORE_KEY = 'contatados_portabilidade_v1';
@@ -587,7 +588,7 @@ function render(){
     (tf==='todas' || c.equipe===tf) &&
     (st==='todos' || (st==='pendentes' && !contacted[c.cpf]) || (st==='contatados' && contacted[c.cpf])) &&
     (!q || normTxt(c.nome).includes(nq) || (qd && c.cpf.includes(qd))
-      || c.contracts.some(ct => normTxt(ct.banco).includes(nq) || ct.contrato.toLowerCase().includes(nq) || ct.nb.includes(qd))));
+      || c.contracts.some(ct => normTxt(ct.banco).includes(nq) || ct.contrato.toLowerCase().includes(nq) || (qd && ct.nb.includes(qd)))));
 
   const sortKey = { ecoMes:'totalEcoMes', saldo:'totalSaldo', txAtual:'maxTxAtual', nome:'nome' }[s] || s;
   rows.sort((a,b)=>{
