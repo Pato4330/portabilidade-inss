@@ -151,6 +151,22 @@ footer{margin-top:32px;color:rgba(148,163,184,.5);font-size:11px;text-align:cent
 .sb-contract .sc-arrow .eco{color:var(--ok2);font-weight:700;margin-left:auto;background:var(--okbg);padding:4px 10px;border-radius:8px;font-size:11px}
 .sb-empty{padding:40px;text-align:center;color:var(--mut)}
 @media(max-width:700px){.sidebar{width:100vw}}
+.login-overlay{position:fixed;inset:0;background:var(--bg);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px}
+.login-overlay.hidden{display:none}
+.login-box{width:min(400px,100%);background:var(--card);border:1px solid var(--line);border-radius:22px;padding:36px;box-shadow:0 8px 40px rgba(0,0,0,.4)}
+.login-box h2{font-size:22px;font-weight:800;letter-spacing:-.4px;margin-bottom:4px;background:linear-gradient(135deg,#f1f5f9,#c7d2fe);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.login-box p{font-size:13px;color:var(--mut);margin-bottom:24px}
+.login-box label{display:block;font-size:12px;color:var(--mut);font-weight:600;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.login-box input{width:100%;background:rgba(15,23,42,.6);border:1px solid var(--line);color:var(--txt);border-radius:var(--radius-sm);padding:13px 14px;font-size:14px;outline:none;font-family:inherit;margin-bottom:16px;transition:all .2s}
+.login-box input:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(99,102,241,.15)}
+.login-box button{width:100%;background:linear-gradient(135deg,var(--acc),#7c3aed);border:none;color:#fff;border-radius:var(--radius-sm);padding:13px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;box-shadow:0 2px 12px rgba(99,102,241,.3)}
+.login-box button:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(99,102,241,.4)}
+.login-box button:disabled{opacity:.5;cursor:wait;transform:none}
+.login-msg{font-size:12px;font-weight:600;margin-top:12px;min-height:16px}
+.login-msg.erro{color:#f87171}
+.login-msg.ok{color:var(--ok2)}
+.login-user{display:inline-flex;align-items:center;gap:6px;margin-left:auto;font-size:11px;color:var(--mut);background:rgba(30,41,59,.6);border:1px solid var(--line);border-radius:999px;padding:4px 12px;cursor:pointer;transition:all .2s}
+.login-user:hover{border-color:var(--danger);color:var(--danger)}
 </style>
 </head>
 <body>
@@ -217,7 +233,7 @@ footer{margin-top:32px;color:rgba(148,163,184,.5);font-size:11px;text-align:cent
   <div class="cards2" id="list"></div>
   <div class="empty" id="empty" style="display:none">Nenhum cliente encontrado.</div>
 
-  <footer>Dados da Pesquisa Resolutiva (INSS) · Simulação FinantoBank · taxa QI Tech 1,66% a.m. · Contatos e equipe sincronizados <span id="syncLabel">no navegador</span></footer>
+  <footer>Dados da Pesquisa Resolutiva (INSS) · Simulação FinantoBank · taxa QI Tech 1,66% a.m. · Contatos e equipe sincronizados <span id="syncLabel">no navegador</span> <span class="login-user" id="loginUser" title="Sair"></span></footer>
 </div>
 
 <div class="sidebar-overlay" id="overlay"></div>
@@ -230,6 +246,19 @@ footer{margin-top:32px;color:rgba(148,163,184,.5);font-size:11px;text-align:cent
     <button class="sidebar-close" id="sbClose" aria-label="Fechar">&times;</button>
   </div>
   <div class="sidebar-body" id="sbBody"></div>
+</div>
+
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-box">
+    <h2>Portabilidade INSS</h2>
+    <p>Área restrita — entre com suas credenciais</p>
+    <label for="loginEmail">Email</label>
+    <input id="loginEmail" type="email" placeholder="seu@email.com" autocomplete="username">
+    <label for="loginPass">Senha</label>
+    <input id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password">
+    <button id="loginBtn">Entrar</button>
+    <div class="login-msg" id="loginMsg"></div>
+  </div>
 </div>
 
 <script>
@@ -250,6 +279,15 @@ const fmtData = s => {
 };
 
 const REMOTE = !!(CONFIG.url && CONFIG.anonKey);
+const SESS_KEY = 'sess_portabilidade_v1';
+let session = null;
+try{ session = JSON.parse(localStorage.getItem(SESS_KEY)||'null'); }catch(e){ session = null; }
+function authHeaders(){
+  const h = { apikey: CONFIG.anonKey };
+  if(session && session.access_token) h.Authorization = 'Bearer ' + session.access_token;
+  else h.Authorization = 'Bearer ' + CONFIG.anonKey;
+  return h;
+}
 let contacted = {};
 let currentTeam = (()=>{ try{ return localStorage.getItem(TEAM_KEY)||''; }catch(e){ return ''; } })();
 
@@ -298,10 +336,7 @@ async function loadContacted(){
   if(REMOTE){
     try{
       const url = CONFIG.url.replace(/\/$/,'') + '/rest/v1/contatos?select=cpf,contatado';
-      const res = await fetch(url, { headers: {
-        apikey: CONFIG.anonKey,
-        Authorization: 'Bearer ' + CONFIG.anonKey
-      }});
+      const res = await fetch(url, { headers: authHeaders() });
       if(res.ok){
         const arr = await res.json();
         contacted = {};
@@ -323,8 +358,7 @@ function toggleContact(cpf, checked){
     const body = { cpf: cpf, contatado: !!checked, atualizado_em: new Date().toISOString() };
     try{
       fetch(url, { method:'POST', headers:{
-        apikey: CONFIG.anonKey,
-        Authorization: 'Bearer ' + CONFIG.anonKey,
+        ...authHeaders(),
         'Content-Type':'application/json',
         Prefer: 'resolution=merge-duplicates,return=minimal'
       }, body: JSON.stringify(body) }).catch(()=>{});
@@ -337,10 +371,7 @@ async function refreshData(){
   if(!REMOTE) return;
   try{
     const url = CONFIG.url.replace(/\/$/,'') + '/rest/v1/clientes?select=*&order=nome.asc';
-    const res = await fetch(url, { headers: {
-      apikey: CONFIG.anonKey,
-      Authorization: 'Bearer ' + CONFIG.anonKey
-    }});
+    const res = await fetch(url, { headers: authHeaders() });
     if(res.ok){
       const arr = await res.json();
       if(Array.isArray(arr) && arr.length){
@@ -375,7 +406,7 @@ async function buscarCliente(){
   try{
     const res = await fetch(CONFIG.buscarUrl, {
       method:'POST',
-      headers: { 'Content-Type':'application/json', 'x-func-key': CONFIG.funcKey },
+      headers: { 'Content-Type':'application/json', 'x-func-key': CONFIG.funcKey, ...(session?{Authorization:'Bearer '+session.access_token}:{}) },
       body: JSON.stringify({ valor: valor })
     });
     const j = await res.json();
@@ -407,7 +438,7 @@ async function calcularCard(){
   try{
     const res = await fetch(CONFIG.funcUrl, {
       method:'POST',
-      headers: { 'Content-Type':'application/json', 'x-func-key': CONFIG.funcKey },
+      headers: { 'Content-Type':'application/json', 'x-func-key': CONFIG.funcKey, ...(session?{Authorization:'Bearer '+session.access_token}:{}) },
       body: JSON.stringify({ cpf: lastSearch.cpf, equipe: currentTeam })
     });
     const j = await res.json();
@@ -455,8 +486,7 @@ async function moverCliente(cpf, equipe, msgEl){
   try{
     const url = CONFIG.url.replace(/\/$/,'') + '/rest/v1/clientes?cpf=eq.' + encodeURIComponent(cpf);
     const res = await fetch(url, { method:'PATCH', headers:{
-      apikey: CONFIG.anonKey,
-      Authorization: 'Bearer ' + CONFIG.anonKey,
+      ...authHeaders(),
       'Content-Type':'application/json',
       Prefer: 'return=minimal'
     }, body: JSON.stringify({ equipe: equipe }) });
@@ -476,8 +506,7 @@ async function moverInapto(cpf, inapto, msgEl){
   try{
     const url = CONFIG.url.replace(/\/$/,'') + '/rest/v1/clientes?cpf=eq.' + encodeURIComponent(cpf);
     const res = await fetch(url, { method:'PATCH', headers:{
-      apikey: CONFIG.anonKey,
-      Authorization: 'Bearer ' + CONFIG.anonKey,
+      ...authHeaders(),
       'Content-Type':'application/json',
       Prefer: 'return=minimal'
     }, body: JSON.stringify({ inapto: inapto }) });
@@ -689,10 +718,70 @@ document.getElementById('minEco').addEventListener('change',render);
 document.getElementById('status').addEventListener('change',render);
 document.getElementById('equipeFiltro').addEventListener('change',render);
 
+function loginMsg(txt, cls){
+  const m = document.getElementById('loginMsg');
+  m.textContent = txt;
+  m.className = 'login-msg' + (cls?' '+cls:'');
+}
+
+async function doLogin(){
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass  = document.getElementById('loginPass').value;
+  const btn = document.getElementById('loginBtn');
+  if(!email || !pass){ loginMsg('Informe email e senha.', 'erro'); return; }
+  btn.disabled = true;
+  loginMsg('Entrando...');
+  try{
+    const res = await fetch(CONFIG.url.replace(/\/$/,'') + '/auth/v1/token?grant_type=password', {
+      method:'POST',
+      headers: { 'Content-Type':'application/json', apikey: CONFIG.anonKey },
+      body: JSON.stringify({ email, password: pass })
+    });
+    const j = await res.json();
+    if(!res.ok) throw new Error(j.error_description || j.msg || j.error || 'falha no login');
+    session = { access_token: j.access_token, refresh_token: j.refresh_token, email: j.user.email };
+    try{ localStorage.setItem(SESS_KEY, JSON.stringify(session)); }catch(e){}
+    loginMsg('Entrando...', 'ok');
+    document.getElementById('loginOverlay').classList.add('hidden');
+    renderUserBadge();
+    await loadContacted();
+    await refreshData();
+    render();
+  }catch(e){
+    loginMsg('Erro: '+(e.message||e), 'erro');
+  }finally{
+    btn.disabled = false;
+  }
+}
+
+function doLogout(){
+  session = null;
+  try{ localStorage.removeItem(SESS_KEY); }catch(e){}
+  document.getElementById('loginOverlay').classList.remove('hidden');
+  renderUserBadge();
+  document.getElementById('list').innerHTML = '';
+}
+
+function renderUserBadge(){
+  const el = document.getElementById('loginUser');
+  if(el) el.textContent = session ? '⏻ ' + session.email : '';
+}
+
+document.getElementById('loginBtn').onclick = doLogin;
+document.getElementById('loginEmail').addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
+document.getElementById('loginPass').addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
+document.getElementById('loginUser').onclick = doLogout;
+
 (async function(){
   syncLabel();
   renderTeam();
   document.getElementById('equipeFiltro').value = 'todas';
+  renderUserBadge();
+  if(!session){
+    document.getElementById('loginOverlay').classList.remove('hidden');
+    return;
+  }
+  document.getElementById('loginOverlay').classList.add('hidden');
   await loadContacted();
   await refreshData();
   render();
