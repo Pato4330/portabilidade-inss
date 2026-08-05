@@ -48,8 +48,9 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;
 .hero::after{content:'';position:absolute;bottom:-60%;left:-10%;width:300px;height:300px;background:radial-gradient(circle,rgba(16,185,129,.08),transparent 70%);pointer-events:none}
 .hero h1{font-size:26px;font-weight:800;letter-spacing:-.5px;background:linear-gradient(135deg,#f1f5f9,#c7d2fe);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .hero p{color:var(--mut);margin-top:6px;font-size:14px;font-weight:400}
-.badge{display:inline-flex;align-items:center;gap:6px;background:var(--okbg);color:var(--ok2);border:1px solid var(--okline);border-radius:999px;padding:5px 16px;font-size:13px;font-weight:600;margin-top:12px}
-.badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--ok)}
+.badge{display:inline-flex;align-items:center;gap:7px;background:rgba(16,185,129,.18);color:#6ee7b7;border:1px solid rgba(16,185,129,.5);border-radius:999px;padding:6px 18px;font-size:13px;font-weight:700;margin-top:12px;letter-spacing:.2px;box-shadow:0 0 16px rgba(16,185,129,.15)}
+.badge::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok)}
+body[data-mode="claro"] .badge{background:#d1fae5;color:#065f46;border-color:#6ee7b7;box-shadow:none}
 .teamsw{display:flex;gap:8px;margin-top:16px}
 .teamsw button{background:rgba(var(--panel-rgb),.6);border:1px solid var(--line);color:var(--mut);border-radius:var(--radius-sm);padding:8px 20px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit}
 .teamsw button:hover{border-color:var(--acc);color:var(--txt);transform:translateY(-1px)}
