@@ -350,6 +350,22 @@ function authHeaders(){
   else h.Authorization = 'Bearer ' + CONFIG.anonKey;
   return h;
 }
+async function refreshSession(){
+  if(!session || !session.refresh_token) return false;
+  try{
+    const res = await fetch(CONFIG.url.replace(/\/$/,'') + '/auth/v1/token?grant_type=refresh_token', {
+      method:'POST',
+      headers: { 'Content-Type':'application/json', apikey: CONFIG.anonKey },
+      body: JSON.stringify({ refresh_token: session.refresh_token })
+    });
+    const j = await res.json();
+    if(!res.ok) throw new Error(j.error_description || j.msg || j.error || 'refresh falhou');
+    session = { access_token: j.access_token, refresh_token: j.refresh_token || session.refresh_token, email: session.email };
+    try{ localStorage.setItem(SESS_KEY, JSON.stringify(session)); }catch(e){}
+    renderUserBadge();
+    return true;
+  }catch(e){ return false; }
+}
 let contacted = {};
 let currentTeam = (()=>{ try{ return localStorage.getItem(TEAM_KEY)||''; }catch(e){ return ''; } })();
 
@@ -398,7 +414,8 @@ async function loadContacted(){
   if(REMOTE){
     try{
       const url = CONFIG.url.replace(/\/$/,'') + '/rest/v1/contatos?select=cpf,contatado';
-      const res = await fetch(url, { headers: authHeaders() });
+      let res = await fetch(url, { headers: authHeaders() });
+      if(res.status===401 && await refreshSession()) res = await fetch(url, { headers: authHeaders() });
       if(res.ok){
         const arr = await res.json();
         contacted = {};
@@ -418,13 +435,14 @@ function toggleContact(cpf, checked){
   if(REMOTE){
     const url = CONFIG.url.replace(/\/$/,'') + '/rest/v1/contatos';
     const body = { cpf: cpf, contatado: !!checked, atualizado_em: new Date().toISOString() };
-    try{
-      fetch(url, { method:'POST', headers:{
-        ...authHeaders(),
-        'Content-Type':'application/json',
-        Prefer: 'resolution=merge-duplicates,return=minimal'
-      }, body: JSON.stringify(body) }).catch(()=>{});
-    }catch(e){}
+    const post = () => fetch(url, { method:'POST', headers:{
+      ...authHeaders(),
+      'Content-Type':'application/json',
+      Prefer: 'resolution=merge-duplicates,return=minimal'
+    }, body: JSON.stringify(body) });
+    post().then(async r => {
+      if(r.status===401 && await refreshSession()) await post();
+    }).catch(()=>{});
   }
   applyContacted();
 }
@@ -433,7 +451,11 @@ async function refreshData(){
   if(!REMOTE) return;
   try{
     const url = CONFIG.url.replace(/\/$/,'') + '/rest/v1/clientes?select=*&order=nome.asc';
-    const res = await fetch(url, { headers: authHeaders() });
+    let res = await fetch(url, { headers: authHeaders() });
+    if(res.status===401){
+      if(await refreshSession()) res = await fetch(url, { headers: authHeaders() });
+      else { doLogout(); return; }
+    }
     if(res.ok){
       const arr = await res.json();
       if(Array.isArray(arr) && arr.length){
