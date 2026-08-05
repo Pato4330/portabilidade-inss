@@ -81,6 +81,9 @@ body[data-mode="claro"] .badge{background:#d1fae5;color:#065f46;border-color:#6e
 select{appearance:none;-webkit-appearance:none;background-color:var(--card);border:1px solid var(--line);color:var(--txt);border-radius:var(--radius);padding:13px 40px 13px 16px;font-size:13px;font-weight:500;outline:none;cursor:pointer;font-family:inherit;transition:border-color .2s,box-shadow .2s,background-color .2s;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 15px center;background-size:12px}
 select:hover{border-color:rgba(var(--acc-rgb),.6)}
 select:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(var(--acc-rgb),.15)}
+select option{background:var(--bg2);color:var(--txt);font-family:inherit;font-size:13px;font-weight:500;padding:10px 14px}
+select option:checked{background:rgba(var(--acc-rgb),.25);color:var(--acc2)}
+select option:disabled{color:var(--mut)}
 .cards2{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;align-items:start}
 .pcard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);display:flex;flex-direction:column;transition:all .25s cubic-bezier(.4,0,.2,1);cursor:pointer;overflow:hidden;box-shadow:var(--shadow)}
 .pcard:hover{border-color:rgba(var(--acc-rgb),.5);transform:translateY(-3px);box-shadow:0 8px 32px rgba(var(--acc-rgb),.15),var(--shadow)}
