@@ -181,8 +181,9 @@ footer{margin-top:32px;color:rgba(var(--mut-rgb),.5);font-size:11px;text-align:c
 .login-msg{font-size:12px;font-weight:600;margin-top:12px;min-height:16px}
 .login-msg.erro{color:#f87171}
 .login-msg.ok{color:var(--ok2)}
-.login-user{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--mut);background:rgba(var(--panel-rgb),.6);border:1px solid var(--line);border-radius:999px;padding:4px 12px;cursor:pointer;transition:all .2s}
-.login-user:hover{border-color:var(--danger);color:var(--danger)}
+.logout-btn{width:44px;height:44px;border-radius:14px;background:var(--card);border:1px solid var(--line);color:var(--mut);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:color .25s,border-color .25s,box-shadow .25s,background .25s;box-shadow:var(--shadow)}
+.logout-btn svg{width:19px;height:19px}
+.logout-btn:hover{color:var(--danger);border-color:var(--danger);background:var(--dangerbg);box-shadow:0 0 0 3px rgba(239,68,68,.15)}
 .hero .settings-wrap{position:absolute;top:20px;right:20px;z-index:20;display:flex;align-items:center;gap:8px}
 .settings-btn{width:44px;height:44px;border-radius:14px;background:var(--card);border:1px solid var(--line);color:var(--mut);font-size:20px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .25s,color .25s,border-color .25s,box-shadow .25s;box-shadow:var(--shadow)}
 .settings-btn:hover{color:var(--txt);border-color:var(--acc);box-shadow:0 0 0 3px rgba(var(--acc-rgb),.15);transform:rotate(30deg)}
@@ -210,7 +211,7 @@ footer{margin-top:32px;color:rgba(var(--mut-rgb),.5);font-size:11px;text-align:c
   <div class="hero">
     <div class="settings-wrap">
       <button class="settings-btn" id="settingsBtn" title="Configurações">&#9881;</button>
-      <span class="login-user" id="loginUser" title="Sair"></span>
+      <span class="logout-btn" id="loginUser" title="Sair"></span>
       <div class="settings-panel" id="settingsPanel">
         <div class="sec">
           <h4>Modo</h4>
@@ -818,9 +819,13 @@ function doLogout(){
   document.getElementById('list').innerHTML = '';
 }
 
+const LOGOUT_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>';
 function renderUserBadge(){
   const el = document.getElementById('loginUser');
-  if(el) el.textContent = session ? '⏻ ' + session.email : '';
+  if(!el) return;
+  el.innerHTML = LOGOUT_ICON;
+  el.style.display = session ? 'flex' : 'none';
+  el.title = session ? 'Sair · ' + session.email : '';
 }
 
 const THEME_KEY = 'tema_portabilidade_v1';
