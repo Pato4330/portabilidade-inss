@@ -28,7 +28,7 @@ body[data-mode="claro"]{
   --done-top:#d1fae5; --inapto-top:#fee2e2;
   --shadow:0 4px 24px rgba(var(--input-rgb),.08);
 }
-body[data-mode="claro"] .hero h1,body[data-mode="claro"] .login-box h2{background:linear-gradient(135deg,#0f172a,var(--acc))}
+body[data-mode="claro"] .hero h1,body[data-mode="claro"] .login-box h2{background-image:linear-gradient(135deg,#0f172a,var(--acc));-webkit-background-clip:text;background-clip:text}
 body[data-theme="verde"]{--acc:#10b981;--acc2:#34d399;--acc-rgb:16,185,129;--acc-deep:#059669;--blob1:rgba(16,185,129,.22);--blob2:rgba(99,102,241,.16);--blob3:rgba(45,212,191,.14)}
 body[data-theme="roxo"]{--acc:#8b5cf6;--acc2:#a78bfa;--acc-rgb:139,92,246;--acc-deep:#6d28d9;--blob1:rgba(139,92,246,.22);--blob2:rgba(167,139,250,.16);--blob3:rgba(99,102,241,.14)}
 body[data-theme="dourado"]{--acc:#f59e0b;--acc2:#fbbf24;--acc-rgb:245,158,11;--acc-deep:#d97706;--blob1:rgba(245,158,11,.2);--blob2:rgba(251,191,36,.14);--blob3:rgba(217,119,6,.14)}
@@ -183,11 +183,10 @@ footer{margin-top:32px;color:rgba(var(--mut-rgb),.5);font-size:11px;text-align:c
 .login-msg.ok{color:var(--ok2)}
 .login-user{display:inline-flex;align-items:center;gap:6px;margin-left:auto;font-size:11px;color:var(--mut);background:rgba(var(--panel-rgb),.6);border:1px solid var(--line);border-radius:999px;padding:4px 12px;cursor:pointer;transition:all .2s}
 .login-user:hover{border-color:var(--danger);color:var(--danger)}
-.tools{position:relative}
-.settings-btn{width:44px;height:44px;flex:none;margin-left:auto;border-radius:14px;background:var(--card);border:1px solid var(--line);color:var(--mut);font-size:20px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:color .25s,border-color .25s,box-shadow .25s;box-shadow:var(--shadow)}
-.settings-btn:hover{color:var(--txt);border-color:var(--acc);box-shadow:0 0 0 3px rgba(var(--acc-rgb),.15);animation:gearspin .7s linear infinite}
-@keyframes gearspin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
-.settings-panel{position:absolute;top:calc(100% + 8px);right:0;z-index:150;background:var(--bg2);border:1px solid var(--line);border-radius:16px;padding:18px;width:210px;box-shadow:var(--shadow);display:none}
+.hero .settings-wrap{position:absolute;top:20px;right:20px;z-index:20}
+.settings-btn{width:44px;height:44px;border-radius:14px;background:var(--card);border:1px solid var(--line);color:var(--mut);font-size:20px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .25s,color .25s,border-color .25s,box-shadow .25s;box-shadow:var(--shadow)}
+.settings-btn:hover{color:var(--txt);border-color:var(--acc);box-shadow:0 0 0 3px rgba(var(--acc-rgb),.15);transform:rotate(30deg)}
+.settings-panel{position:fixed;z-index:150;background:var(--bg2);border:1px solid var(--line);border-radius:16px;padding:18px;width:210px;box-shadow:var(--shadow);display:none}
 .settings-panel.open{display:block}
 .settings-panel h4{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--mut);margin-bottom:10px;font-weight:700}
 .settings-panel .sec{margin-bottom:18px}
@@ -209,6 +208,28 @@ footer{margin-top:32px;color:rgba(var(--mut-rgb),.5);font-size:11px;text-align:c
 <div class="blob blob3"></div>
 <div class="wrap">
   <div class="hero">
+    <div class="settings-wrap">
+      <button class="settings-btn" id="settingsBtn" title="Configurações">&#9881;</button>
+      <div class="settings-panel" id="settingsPanel">
+        <div class="sec">
+          <h4>Modo</h4>
+          <div class="mode-row">
+            <button class="mode-swatch" data-mode="escuro">Escuro</button>
+            <button class="mode-swatch" data-mode="claro">Claro</button>
+          </div>
+        </div>
+        <div class="sec">
+          <h4>Cor do destaque</h4>
+          <div class="theme-row" id="themeRow">
+            <button class="theme-swatch" data-theme="padrao"><span class="dot" style="background:#6366f1"></span>Padrão</button>
+            <button class="theme-swatch" data-theme="verde"><span class="dot" style="background:#10b981"></span>Verde</button>
+            <button class="theme-swatch" data-theme="roxo"><span class="dot" style="background:#8b5cf6"></span>Roxo</button>
+            <button class="theme-swatch" data-theme="dourado"><span class="dot" style="background:#f59e0b"></span>Dourado</button>
+            <button class="theme-swatch" data-theme="ciano"><span class="dot" style="background:#06b6d4"></span>Ciano</button>
+          </div>
+        </div>
+      </div>
+    </div>
     <h1>Portabilidade INSS</h1>
     <p>Clientes elegíveis — portabilidade a <b>1,66% a.m.</b> · busque um CPF para criar o card e calcular automaticamente</p>
     <span class="badge" id="heroBadge">0 clientes · 0 contratos</span>
@@ -261,26 +282,6 @@ footer{margin-top:32px;color:rgba(var(--mut-rgb),.5);font-size:11px;text-align:c
       <option value="20">Economia mínima: R$ 20/mês</option>
       <option value="50">Economia mínima: R$ 50/mês</option>
     </select>
-    <button class="settings-btn" id="settingsBtn" title="Configurações">&#9881;</button>
-    <div class="settings-panel" id="settingsPanel">
-      <div class="sec">
-        <h4>Modo</h4>
-        <div class="mode-row">
-          <button class="mode-swatch" data-mode="escuro">Escuro</button>
-          <button class="mode-swatch" data-mode="claro">Claro</button>
-        </div>
-      </div>
-      <div class="sec">
-        <h4>Cor do destaque</h4>
-        <div class="theme-row" id="themeRow">
-          <button class="theme-swatch" data-theme="padrao"><span class="dot" style="background:#6366f1"></span>Padrão</button>
-          <button class="theme-swatch" data-theme="verde"><span class="dot" style="background:#10b981"></span>Verde</button>
-          <button class="theme-swatch" data-theme="roxo"><span class="dot" style="background:#8b5cf6"></span>Roxo</button>
-          <button class="theme-swatch" data-theme="dourado"><span class="dot" style="background:#f59e0b"></span>Dourado</button>
-          <button class="theme-swatch" data-theme="ciano"><span class="dot" style="background:#06b6d4"></span>Ciano</button>
-        </div>
-      </div>
-    </div>
   </div>
 
   <div class="resultsInfo" id="resultsInfo"></div>
@@ -841,8 +842,16 @@ function applyMode(mode){
 }
 document.getElementById('settingsBtn').onclick = e => {
   e.stopPropagation();
-  document.getElementById('settingsPanel').classList.toggle('open');
+  const p = document.getElementById('settingsPanel');
+  if(!p.classList.contains('open')){
+    const r = document.getElementById('settingsBtn').getBoundingClientRect();
+    p.style.left = Math.max(8, r.right - 210) + 'px';
+    p.style.top = (r.bottom + 8) + 'px';
+  }
+  p.classList.toggle('open');
 };
+window.addEventListener('scroll', () => document.getElementById('settingsPanel').classList.remove('open'), true);
+window.addEventListener('resize', () => document.getElementById('settingsPanel').classList.remove('open'));
 document.getElementById('settingsPanel').addEventListener('click', e => e.stopPropagation());
 for(const b of document.querySelectorAll('.theme-swatch'))
   b.onclick = () => applyTheme(b.getAttribute('data-theme'));
