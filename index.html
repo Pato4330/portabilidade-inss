@@ -181,9 +181,9 @@ footer{margin-top:32px;color:rgba(var(--mut-rgb),.5);font-size:11px;text-align:c
 .login-msg{font-size:12px;font-weight:600;margin-top:12px;min-height:16px}
 .login-msg.erro{color:#f87171}
 .login-msg.ok{color:var(--ok2)}
-.login-user{display:inline-flex;align-items:center;gap:6px;margin-left:auto;font-size:11px;color:var(--mut);background:rgba(var(--panel-rgb),.6);border:1px solid var(--line);border-radius:999px;padding:4px 12px;cursor:pointer;transition:all .2s}
+.login-user{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--mut);background:rgba(var(--panel-rgb),.6);border:1px solid var(--line);border-radius:999px;padding:4px 12px;cursor:pointer;transition:all .2s}
 .login-user:hover{border-color:var(--danger);color:var(--danger)}
-.hero .settings-wrap{position:absolute;top:20px;right:20px;z-index:20}
+.hero .settings-wrap{position:absolute;top:20px;right:20px;z-index:20;display:flex;align-items:center;gap:8px}
 .settings-btn{width:44px;height:44px;border-radius:14px;background:var(--card);border:1px solid var(--line);color:var(--mut);font-size:20px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .25s,color .25s,border-color .25s,box-shadow .25s;box-shadow:var(--shadow)}
 .settings-btn:hover{color:var(--txt);border-color:var(--acc);box-shadow:0 0 0 3px rgba(var(--acc-rgb),.15);transform:rotate(30deg)}
 .settings-panel{position:fixed;z-index:150;background:var(--bg2);border:1px solid var(--line);border-radius:16px;padding:18px;width:210px;box-shadow:var(--shadow);display:none}
@@ -210,6 +210,7 @@ footer{margin-top:32px;color:rgba(var(--mut-rgb),.5);font-size:11px;text-align:c
   <div class="hero">
     <div class="settings-wrap">
       <button class="settings-btn" id="settingsBtn" title="Configurações">&#9881;</button>
+      <span class="login-user" id="loginUser" title="Sair"></span>
       <div class="settings-panel" id="settingsPanel">
         <div class="sec">
           <h4>Modo</h4>
@@ -288,7 +289,7 @@ footer{margin-top:32px;color:rgba(var(--mut-rgb),.5);font-size:11px;text-align:c
   <div class="cards2" id="list"></div>
   <div class="empty" id="empty" style="display:none">Nenhum cliente encontrado.</div>
 
-  <footer>Dados da Pesquisa Resolutiva (INSS) · Simulação FinantoBank · taxa 1,66% a.m. · Contatos e equipe sincronizados <span id="syncLabel">no navegador</span> <span class="login-user" id="loginUser" title="Sair"></span></footer>
+  <footer>Dados da Pesquisa Resolutiva (INSS) · Simulação FinantoBank · taxa 1,66% a.m. · Contatos e equipe sincronizados <span id="syncLabel">no navegador</span></footer>
 </div>
 
 <div class="sidebar-overlay" id="overlay"></div>
