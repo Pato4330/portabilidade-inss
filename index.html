@@ -94,6 +94,9 @@ select option:disabled{color:var(--mut)}
 .pcard.inapto:hover{border-color:var(--danger);box-shadow:0 8px 32px rgba(239,68,68,.1),var(--shadow)}
 .pcard.inapto .ecobadge{background:var(--dangerbg);border-color:var(--dangerline);color:var(--danger)}
 .pcard.inapto .ecobadge .l{color:var(--danger)}
+.pcard.port-pura{border:1.5px solid #f59e0b;background:linear-gradient(180deg,rgba(245,158,11,.12),var(--card) 45%,var(--card))}
+.pcard.port-pura:hover{border-color:#fbbf24;box-shadow:0 8px 32px rgba(245,158,11,.18),var(--shadow)}
+.pcard.port-pura .nome::after{content:"PORT PURA";display:inline-flex;align-items:center;margin-left:8px;font-size:9px;font-weight:700;letter-spacing:.6px;color:#f59e0b;background:rgba(245,158,11,.12);border:1px solid #f59e0b;border-radius:6px;padding:3px 8px;vertical-align:2px}
 .pcard.done.inapto{border-color:var(--dangerline)}
 .pcard.done .nome::after{content:"CONTATADO";display:inline-flex;align-items:center;margin-left:8px;font-size:9px;font-weight:700;letter-spacing:.6px;color:var(--ok2);background:var(--okbg);border:1px solid var(--okline);border-radius:6px;padding:3px 8px;vertical-align:2px}
 .pcard.inapto .nome::after{content:"INAPTO";display:inline-flex;align-items:center;margin-left:8px;font-size:9px;font-weight:700;letter-spacing:.6px;color:var(--danger);background:var(--dangerbg);border:1px solid var(--dangerline);border-radius:6px;padding:3px 8px;vertical-align:2px}
@@ -233,6 +236,12 @@ footer{margin-top:32px;color:rgba(var(--mut-rgb),.5);font-size:11px;text-align:c
             <button class="theme-swatch" data-theme="roxo"><span class="dot" style="background:#8b5cf6"></span>Roxo</button>
             <button class="theme-swatch" data-theme="dourado"><span class="dot" style="background:#f59e0b"></span>Dourado</button>
             <button class="theme-swatch" data-theme="ciano"><span class="dot" style="background:#06b6d4"></span>Ciano</button>
+          </div>
+        </div>
+        <div class="sec">
+          <h4>Port pura</h4>
+          <div class="mode-row">
+            <label class="switch-row"><input type="checkbox" id="portPuraToggle"><span class="lbl">Destacar cards com port pura (borda dourada)</span></label>
           </div>
         </div>
       </div>
@@ -381,7 +390,7 @@ function norm(d){
     ecoMes: Number(d.ecomes!=null?d.ecomes:d.ecoMes)||0,
     ecoTotal: Number(d.ecototal!=null?d.ecototal:d.ecoTotal)||0,
     prazo: Number(d.prazo||0), equipe: d.equipe||'', inapto: !!d.inapto,
-    dtcontrato: d.dtcontrato||'', erro: d.erro||''
+    dtcontrato: d.dtcontrato||'', erro: d.erro||'', motivo: d.motivo||'', nascimento: d.nascimento||''
   };
 }
 for(let i=0;i<DATA.length;i++) DATA[i]=norm(DATA[i]);
@@ -631,6 +640,7 @@ function openSidebar(client){
         ${c.dtcontrato ? `<div class="sc-item" style="grid-column:span 2"><div class="sl">Início</div><div class="sv">${fmtData(c.dtcontrato)}</div></div>` : ''}
       </div>
       ${c.erro ? `<div style="margin-top:8px;padding:8px 10px;border:1px solid rgba(239,68,68,.4);background:rgba(239,68,68,.08);border-radius:8px;font-size:11px;color:#f87171"><b>Incompatível:</b> ${c.erro}</div>` : ''}
+      ${c.motivo ? `<div style="margin-top:8px;padding:8px 10px;border:1px solid rgba(239,68,68,.4);background:rgba(239,68,68,.08);border-radius:8px;font-size:11px;color:#f87171"><b>Motivo:</b> ${c.motivo}</div>` : ''}
       <div class="sc-arrow">
         <span class="old">${fmt(c.pcAtual)}</span><span>&#8594;</span>
         <span class="new">${fmt(c.pcNova)}</span>
@@ -755,8 +765,10 @@ function buildCard(c){
         <div class="ditem"><div class="l">Taxa</div><div class="v">${tx(ct.txAtual)} → ${tx(ct.txNova)}</div></div>
         <div class="ditem"><div class="l">Parcelas</div><div class="v">${ct.rest}/${ct.prazo}</div></div>
         <div class="ditem"><div class="l">Saldo</div><div class="v">${fmt(ct.saldo)}</div></div>
+        ${ct.port_pura ? `<div class="ditem"><div class="l">Port pura</div><div class="v" style="color:#f59e0b;font-weight:700">Apresentar taxa 1,66%</div></div>` : ''}
         ${ct.dtcontrato ? `<div class="ditem" style="grid-column:span 2"><div class="l">Início</div><div class="v">${fmtData(ct.dtcontrato)}</div></div>` : ''}
         ${ct.erro ? `<div class="ditem" style="grid-column:span 2;border:1px solid rgba(239,68,68,.4);background:rgba(239,68,68,.08)"><div class="l" style="color:#f87171">Incompatível</div><div class="v" style="color:#f87171;font-size:11px">${ct.erro}</div></div>` : ''}
+        ${ct.motivo ? `<div class="ditem" style="grid-column:span 2;border:1px solid rgba(239,68,68,.4);background:rgba(239,68,68,.08)"><div class="l" style="color:#f87171">Motivo</div><div class="v" style="color:#f87171;font-size:11px">${ct.motivo}</div></div>` : ''}
       `).join('')}
     </div>
     <div class="movebar">
@@ -791,6 +803,8 @@ function buildCard(c){
     inaptoChk.disabled = false;
   };
   el.classList.toggle('inapto', c.inapto || false);
+  if(el.classList.contains('inapto')){ el.classList.remove('port-pura'); }
+  else if(c.contracts.some(ct => ct.port_pura) && showPortPura()){ el.classList.add('port-pura'); }
   head.onclick = e => { if(e.target!==tgl && e.target!==chk) openSidebar(c); };
   tgl.onclick = () => { tgl.closest('.pcard').classList.toggle('open'); };
   return el;
@@ -900,6 +914,21 @@ try{ savedTheme = localStorage.getItem(THEME_KEY) || 'padrao'; }catch(e){}
 try{ savedMode = localStorage.getItem(MODE_KEY) || 'escuro'; }catch(e){}
 applyTheme(savedTheme);
 applyMode(savedMode);
+
+const PORT_KEY = 'port_pura_portabilidade_v1';
+let showPortPura = () => true;
+(function initPortToggle(){
+  const el = document.getElementById('portPuraToggle');
+  let on = true;
+  try{ on = localStorage.getItem(PORT_KEY) !== '0'; }catch(e){}
+  el.checked = on;
+  showPortPura = () => on;
+  el.onchange = () => {
+    on = el.checked;
+    try{ localStorage.setItem(PORT_KEY, on ? '1' : '0'); }catch(e){}
+    render();
+  };
+})();
 
 document.getElementById('loginBtn').onclick = doLogin;
 document.getElementById('loginEmail').addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
