@@ -139,6 +139,35 @@ select option:disabled{color:var(--mut)}
 .inapto-bar{display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
 .inapto-bar label{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;gap:5px;cursor:pointer;font-weight:600}
 .inapto-bar input{accent-color:var(--danger);width:16px;height:16px;cursor:pointer}
+.ditem.port-pura{border:1.5px solid #f59e0b;background:linear-gradient(180deg,rgba(245,158,11,.12),rgba(var(--panel-rgb),.5))}
+.pp-chip{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:700;letter-spacing:.6px;color:#f59e0b;background:rgba(245,158,11,.12);border:1px solid #f59e0b;border-radius:6px;padding:2px 7px;vertical-align:2px}
+.anexar-row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.anexar-row button{flex:1;min-width:130px;border-radius:var(--radius-sm);padding:9px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s}
+.anexar-row .ax-sim{background:var(--okbg);border:1px solid var(--okline);color:var(--ok2)}
+.anexar-row .ax-sim:hover{background:var(--ok);color:#fff;border-color:var(--ok)}
+.anexar-row .ax-prop{background:rgba(245,158,11,.12);border:1px solid #f59e0b;color:#fbbf24}
+.anexar-row .ax-prop:hover{background:#f59e0b;color:#1c1000;border-color:#fbbf24}
+.anexar-row .ax-sim:disabled,.anexar-row .ax-prop:disabled{opacity:.5;cursor:wait}
+.anexar-row .ax-msg{flex-basis:100%;font-size:11px;color:var(--mut);font-weight:500}
+.anexar-row .ax-msg.ok{color:var(--ok2)}
+.anexar-row .ax-msg.erro{color:#f87171}
+.anexar-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:400;display:none;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(2px)}
+.anexar-overlay.open{display:flex}
+.anexar-modal{background:var(--bg2);border:1px solid var(--line);border-radius:18px;max-width:680px;width:100%;max-height:88vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.5);padding:22px}
+.anexar-modal h3{font-size:17px;font-weight:800;letter-spacing:-.3px;margin-bottom:4px}
+.anexar-modal .sub{font-size:12px;color:var(--mut);margin-bottom:16px}
+.anexar-modal .fgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.anexar-modal .fcol{display:flex;flex-direction:column;gap:5px}
+.anexar-modal .fcol.full{grid-column:span 2}
+.anexar-modal label{font-size:11px;color:var(--mut);font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.anexar-modal input,.anexar-modal select{background:rgba(var(--input-rgb),.7);border:1px solid var(--line);color:var(--txt);border-radius:9px;padding:10px 12px;font-size:13px;outline:none;font-family:inherit;transition:border-color .2s,box-shadow .2s}
+.anexar-modal input:focus,.anexar-modal select:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(var(--acc-rgb),.15)}
+.anexar-modal .fbtns{display:flex;gap:10px;margin-top:20px}
+.anexar-modal .fbtns button{flex:1;padding:12px;border-radius:var(--radius-sm);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+.anexar-modal .fbtns .cancel{background:var(--card2);border:1px solid var(--line);color:var(--txt)}
+.anexar-modal .fbtns .send{background:linear-gradient(135deg,#f59e0b,#d97706);border:none;color:#1c1000}
+.anexar-modal .fbtns .send:disabled{opacity:.5;cursor:wait}
+.anexar-modal .axnote{font-size:11px;color:var(--mut);margin-top:14px;line-height:1.5}
 .resultsInfo{margin:0 0 12px;font-size:12px;color:var(--mut);font-weight:500}
 .empty{padding:80px;text-align:center;color:var(--mut);font-size:15px}
 footer{margin-top:32px;color:rgba(var(--mut-rgb),.5);font-size:11px;text-align:center;font-weight:500;letter-spacing:.3px}
@@ -332,10 +361,59 @@ footer{margin-top:32px;color:rgba(var(--mut-rgb),.5);font-size:11px;text-align:c
   </div>
 </div>
 
+<div class="anexar-overlay" id="anexarOverlay">
+  <div class="anexar-modal">
+    <h3>Anexar proposta no Finanto</h3>
+    <div class="sub" id="axModalSub"></div>
+    <div class="fgrid">
+      <div class="fcol"><label>Nome da mãe</label><input id="axMae" placeholder="Nome da mãe"></div>
+      <div class="fcol"><label>Telefone</label><input id="axTel" placeholder="(00) 00000-0000"></div>
+      <div class="fcol"><label>Email</label><input id="axEmail" type="email" placeholder="email@cliente.com"></div>
+      <div class="fcol"><label>Sexo</label>
+        <select id="axSexo"><option value="M">Masculino</option><option value="F">Feminino</option></select>
+      </div>
+      <div class="fcol"><label>Estado civil</label>
+        <select id="axCivil"><option>Solteiro</option><option>Casado</option><option>Viúvo</option><option>Divorciado</option><option>Separado</option></select>
+      </div>
+      <div class="fcol"><label>CEP</label><input id="axCep" placeholder="00000-000"></div>
+      <div class="fcol full"><label>Logradouro</label><input id="axRua" placeholder="Rua"></div>
+      <div class="fcol"><label>Número</label><input id="axNum" placeholder="Nº"></div>
+      <div class="fcol"><label>Complemento</label><input id="axComp" placeholder="(opcional)"></div>
+      <div class="fcol"><label>Bairro</label><input id="axBairro" placeholder="Bairro"></div>
+      <div class="fcol"><label>Cidade</label><input id="axCidade" placeholder="Cidade"></div>
+      <div class="fcol"><label>UF</label>
+        <select id="axUf">
+          <option value="">—</option><option>AC</option><option>AL</option><option>AP</option><option>AM</option><option>BA</option><option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option><option>MT</option><option>MS</option><option>MG</option><option>PA</option><option>PB</option><option>PR</option><option>PE</option><option>PI</option><option>RJ</option><option>RN</option><option>RS</option><option>RO</option><option>RR</option><option>SC</option><option>SP</option><option>SE</option><option>TO</option>
+        </select>
+      </div>
+      <div class="fcol full" style="margin-top:8px;border-top:1px dashed var(--line);padding-top:12px"><span style="font-size:11px;color:var(--mut);font-weight:600;text-transform:uppercase;letter-spacing:.4px">Conta para depósito</span></div>
+      <div class="fcol"><label>Banco</label><input id="axBanco" placeholder="Código do banco"></div>
+      <div class="fcol"><label>Agência</label><input id="axAgencia" placeholder="Agência"></div>
+      <div class="fcol"><label>Nº da conta</label><input id="axConta" placeholder="Conta"></div>
+      <div class="fcol"><label>Dígito</label><input id="axDigito"></div>
+      <div class="fcol"><label>Tipo</label>
+        <select id="axTipoConta"><option value="1">Conta corrente</option><option value="2">Poupança</option></select>
+      </div>
+      <div class="fcol full" style="margin-top:8px;border-top:1px dashed var(--line);padding-top:12px"><span style="font-size:11px;color:var(--mut);font-weight:600;text-transform:uppercase;letter-spacing:.4px">Documento (opcional)</span></div>
+      <div class="fcol"><label>Tipo</label>
+        <select id="axDocTipo"><option value="">—</option><option value="rg">RG</option><option value="cnh">CNH</option></select>
+      </div>
+      <div class="fcol"><label>Número</label><input id="axDocNum"></div>
+      <div class="fcol"><label>Órgão emissor</label><input id="axDocEmissor"></div>
+      <div class="fcol"><label>UF</label><input id="axDocUf" maxlength="2"></div>
+    </div>
+    <div class="axnote" id="axModalNote"></div>
+    <div class="fbtns">
+      <button class="cancel" id="axCancel">Cancelar</button>
+      <button class="send" id="axSend">Enviar proposta</button>
+    </div>
+  </div>
+</div>
+
 <script>
 window.onerror=function(m,s,l,c,e){document.title='ERR:'+m+' L'+c;console.error('JS ERROR:',m,'line',c,'col',e)};
 const DATA = [];
-const CONFIG = {"funcKey":"BNnu2AQkxr6qO9f1CUdyKbYjRgSPsHFm","url":"https://fvvrcpqiiygufyovmvwd.supabase.co","funcUrl":"https://fvvrcpqiiygufyovmvwd.supabase.co/functions/v1/calcular-cpf","buscarUrl":"https://fvvrcpqiiygufyovmvwd.supabase.co/functions/v1/buscar-telefone","anonKey":"sb_publishable_SP3QjI8oQQL9fFvVFr1UXA_IsfbMtlg"};
+const CONFIG = {"funcKey":"BNnu2AQkxr6qO9f1CUdyKbYjRgSPsHFm","url":"https://fvvrcpqiiygufyovmvwd.supabase.co","funcUrl":"https://fvvrcpqiiygufyovmvwd.supabase.co/functions/v1/calcular-cpf","buscarUrl":"https://fvvrcpqiiygufyovmvwd.supabase.co/functions/v1/buscar-telefone","anexarUrl":"https://fvvrcpqiiygufyovmvwd.supabase.co/functions/v1/anexar-finanto","anonKey":"sb_publishable_SP3QjI8oQQL9fFvVFr1UXA_IsfbMtlg"};
 const STORE_KEY = 'contatados_portabilidade_v1';
 const TEAM_KEY = 'equipe_atual_portabilidade';
 const fmt = n => n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
@@ -390,7 +468,13 @@ function norm(d){
     ecoMes: Number(d.ecomes!=null?d.ecomes:d.ecoMes)||0,
     ecoTotal: Number(d.ecototal!=null?d.ecototal:d.ecoTotal)||0,
     prazo: Number(d.prazo||0), equipe: d.equipe||'', inapto: !!d.inapto,
-    dtcontrato: d.dtcontrato||'', erro: d.erro||'', motivo: d.motivo||'', nascimento: d.nascimento||''
+    dtcontrato: d.dtcontrato||'', erro: d.erro||'', motivo: d.motivo||'', nascimento: d.nascimento||'',
+    tipo: d.tipo||'', dc: d.dc||'', uf: d.uf||'', mae: d.mae||'',
+    produto: d.produto||'port_refin', ruleId: d.rule_id||'',
+    tabelaNome: d.tabela_nome||'', tabelaCodigo: d.tabela_codigo||'',
+    bankOperationCode: Number(d.bank_operation_code)||0,
+    contratoOrigem: (function(){ try{ return typeof d.contrato_origem==='string' ? JSON.parse(d.contrato_origem) : (d.contrato_origem||null); }catch(e){ return null; } })(),
+    payload: (function(){ try{ return typeof d.payload==='string' ? JSON.parse(d.payload) : (d.payload||null); }catch(e){ return null; } })()
   };
 }
 for(let i=0;i<DATA.length;i++) DATA[i]=norm(DATA[i]);
@@ -536,6 +620,7 @@ async function calcularCard(){
     });
     const j = await res.json();
     if(!res.ok || !j.ok) throw new Error(j.error||'falha no cálculo');
+    try{ localStorage.setItem('anexar_beneficio_'+lastSearch.cpf, JSON.stringify(j.beneficio||{})); }catch(e){}
     setMsg(j.nome+' — '+j.total+' contrato(s) adicionado(s).', 'ok');
     inp.value='';
     cBtn.style.display = 'none';
@@ -739,6 +824,8 @@ function buildCard(c){
   el.dataset.cpf = c.cpf;
   const tag = c.equipe ? `<span class="teamTag ${c.equipe==='Leda'?'tagLeda':'tagFlavia'}">${c.equipe}</span>` :
               `<span class="teamTag tagNone">sem equipe</span>`;
+  const valid = c.contracts.filter(ct => !ct.erro && !ct.inapto && ct.pcNova > 0);
+  const hasAnexar = valid.length > 0;
   el.innerHTML = `
   <div class="phead">
     <div class="row1">
@@ -761,7 +848,7 @@ function buildCard(c){
   <div class="pdetails">
     <div class="dgrid">
       ${c.contracts.map(ct => `
-        <div class="ditem"><div class="l">${ct.banco} · NB ${ct.nb}</div><div class="v">${ct.contrato}</div></div>
+        <div class="ditem ${ct.port_pura ? 'port-pura' : ''}"><div class="l">${ct.banco} · NB ${ct.nb}${ct.port_pura ? ' <span class="pp-chip">PORT PURA</span>' : ''}</div><div class="v">${ct.contrato}</div></div>
         <div class="ditem"><div class="l">Taxa</div><div class="v">${tx(ct.txAtual)} → ${tx(ct.txNova)}</div></div>
         <div class="ditem"><div class="l">Parcelas</div><div class="v">${ct.rest}/${ct.prazo}</div></div>
         <div class="ditem"><div class="l">Saldo</div><div class="v">${fmt(ct.saldo)}</div></div>
@@ -784,6 +871,12 @@ function buildCard(c){
       <label><input type="checkbox" class="inapto-chk"> Inapto</label>
       <span class="mvmsg inapto-msg"></span>
     </div>
+    ${hasAnexar ? `
+    <div class="anexar-row">
+      <button type="button" class="ax-sim" data-ax="simulacao">&#128228; Anexar simulação</button>
+      <button type="button" class="ax-prop" data-ax="proposta">&#128203; Anexar proposta</button>
+      <span class="ax-msg"></span>
+    </div>` : ''}
   </div>`;
   const head = el.querySelector('.phead');
   const tgl  = el.querySelector('.tgl');
@@ -804,10 +897,160 @@ function buildCard(c){
   };
   el.classList.toggle('inapto', c.inapto || false);
   if(el.classList.contains('inapto')){ el.classList.remove('port-pura'); }
-  else if(c.contracts.some(ct => ct.port_pura) && showPortPura()){ el.classList.add('port-pura'); }
+  else if(c.contracts.filter(ct => !ct.erro && !ct.inapto).length > 0 &&
+          c.contracts.filter(ct => !ct.erro && !ct.inapto).every(ct => ct.port_pura) && showPortPura()){ el.classList.add('port-pura'); }
+  const axMsg = el.querySelector('.ax-msg');
+  el.querySelectorAll('[data-ax]').forEach(btn => {
+    btn.onclick = async e => {
+      e.stopPropagation();
+      if(!session){ return; }
+      btn.disabled = true;
+      if(axMsg) axMsg.className = 'ax-msg'; axMsg.textContent = 'Anexando...';
+      try{
+        const r = await anexarCard(c, btn.getAttribute('data-ax'), axMsg);
+        if(r.ok){
+          if(axMsg) axMsg.className = 'ax-msg ok';
+          axMsg.textContent = btn.getAttribute('data-ax')==='proposta'
+            ? 'Proposta enviada à digitação no Bank (status: '+(r.status||'digitando')+').'
+            : 'Simulação anexada no Finanto (rascunho).';
+        }
+      }catch(err){
+        if(axMsg) axMsg.className = 'ax-msg erro';
+        axMsg.textContent = 'Erro: '+(err.message||err);
+      }finally{
+        btn.disabled = false;
+      }
+    };
+  });
   head.onclick = e => { if(e.target!==tgl && e.target!==chk) openSidebar(c); };
   tgl.onclick = () => { tgl.closest('.pcard').classList.toggle('open'); };
   return el;
+}
+
+const AXDATA_KEY = 'anexar_dados_proposta_v1';
+function axGet(){
+  try{ return JSON.parse(localStorage.getItem(AXDATA_KEY)||'{}'); }catch(e){ return {}; }
+}
+function axSet(o){
+  try{ localStorage.setItem(AXDATA_KEY, JSON.stringify(o)); }catch(e){}
+}
+async function postAnexar(body){
+  let res = await fetch(CONFIG.anexarUrl, {
+    method:'POST',
+    headers: { 'Content-Type':'application/json', 'x-func-key': CONFIG.funcKey, ...(session?{Authorization:'Bearer '+session.access_token}:{}) },
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout(150000)
+  });
+  if(res.status===401 && await refreshSession()){
+    res = await fetch(CONFIG.anexarUrl, {
+      method:'POST',
+      headers: { 'Content-Type':'application/json', 'x-func-key': CONFIG.funcKey, ...(session?{Authorization:'Bearer '+session.access_token}:{}) },
+      body: JSON.stringify(body), signal: AbortSignal.timeout(150000)
+    });
+  }
+  const j = await res.json().catch(()=>({}));
+  if(!res.ok || !j.ok) throw new Error(j.error || 'HTTP '+res.status);
+  return j;
+}
+
+function anexarCard(c, acao){
+  const contracts = c.contracts.filter(x => !x.erro && !x.inapto && x.pcNova > 0);
+  if(!contracts.length) return Promise.reject(new Error('sem contratos válidos para anexar'));
+  const first = contracts[0];
+  let saved = {};
+  try{ saved = JSON.parse(localStorage.getItem('anexar_beneficio_'+c.cpf)||'{}'); }catch(e){}
+  const be = Object.assign({
+    nome: c.nome, cpf: c.cpf,
+    nascimento: first.nascimento || '',
+    mae: first.mae || '', sexo: '', tipo: first.tipo || '', dc: first.dc || '',
+    uf: first.uf || '', valorBeneficio: 0, endereco: {}, conta: {}
+  }, saved || {});
+  const body = {
+    acao, cpf: c.cpf, nb: first.nb, nome: c.nome, beneficio: be,
+    itens: contracts.map(ct => ({
+      produto: ct.produto || 'port_refin',
+      bank_operation_code: ct.bankOperationCode,
+      rule_id: ct.ruleId, tabela_nome: ct.tabelaNome, tabela_codigo: ct.tabelaCodigo,
+      prazo: ct.prazo, pcnova: ct.pcNova, txnova: ct.txNova, saldo: ct.saldo,
+      payload: ct.payload, contrato_origem: ct.contratoOrigem
+    }))
+  };
+  if(acao !== 'proposta') return postAnexar(body);
+  return openAnexarProposta(body);
+}
+
+function openAnexarProposta(base){
+  return new Promise((resolve) => {
+    const ov = document.getElementById('anexarOverlay');
+    const b = base.beneficio || {};
+    const end = b.endereco || {};
+    const cnt = b.conta || {};
+    const saved = axGet();
+    const $ = id => document.getElementById(id);
+    $('axModalSub').textContent = 'Cliente: '+(b.nome||'')+' · CPF '+b.cpf+' · NB '+base.nb+' · anexando '+(base.itens.length)+' contrato(s)';
+    $('axModalNote').textContent = 'A proposta será enviada à digitação no Finanto Bank com os cálculos deste card. Os dados do tomador são coletados no momento — o resultado (status) aparece sozinho no card da proposta depois.';
+    $('axMae').value = saved.mae || b.mae || '';
+    $('axTel').value = saved.telefone || '';
+    $('axEmail').value = saved.email || '';
+    $('axSexo').value = (saved.sexo || b.sexo || 'M') === 'F' ? 'F' : 'M';
+    $('axCivil').value = saved.estadoCivil || 'Solteiro';
+    $('axCep').value = saved.cep || end.zipCode || '';
+    $('axRua').value = saved.logradouro || end.address || '';
+    $('axNum').value = saved.numero || '';
+    $('axComp').value = saved.complemento || '';
+    $('axBairro').value = saved.bairro || end.district || '';
+    $('axCidade').value = saved.cidade || end.city || '';
+    $('axUf').value = (saved.uf || b.uf || end.state || '').toUpperCase();
+    $('axBanco').value = saved.banco || (cnt.bankCode||'');
+    $('axAgencia').value = saved.agencia || cnt.agency || '';
+    $('axConta').value = saved.conta || cnt.number || '';
+    $('axDigito').value = saved.digito || '';
+    $('axTipoConta').value = saved.tipoConta || '1';
+    $('axDocTipo').value = saved.docTipo || '';
+    $('axDocNum').value = saved.docNum || '';
+    $('axDocEmissor').value = saved.docEmissor || '';
+    $('axDocUf').value = (saved.docUf || '').toUpperCase();
+    ov.classList.add('open');
+    const sendBtn = $('axSend');
+    const close = ()=>{ ov.classList.remove('open'); };
+    const readForm = () => ({
+      nomeMae: $('axMae').value, telefone: $('axTel').value, email: $('axEmail').value,
+      sexo: $('axSexo').value, estadoCivil: $('axCivil').value,
+      cep: $('axCep').value, logradouro: $('axRua').value, numero: $('axNum').value,
+      complemento: $('axComp').value, bairro: $('axBairro').value, cidade: $('axCidade').value, uf: $('axUf').value,
+      banco: $('axBanco').value, agencia: $('axAgencia').value, conta: $('axConta').value,
+      digito: $('axDigito').value, tipoConta: $('axTipoConta').value,
+      docTipo: $('axDocTipo').value, docNum: $('axDocNum').value,
+      docEmissor: $('axDocEmissor').value, docUf: $('axDocUf').value
+    });
+    $('axCancel').onclick = () => { axSet(readForm()); close(); resolve(null); };
+    ov.onclick = e => { if(e.target===ov){ axSet(readForm()); close(); resolve(null); } };
+    sendBtn.onclick = async () => {
+      const d = readForm();
+      axSet(d);
+      sendBtn.disabled = true;
+      try{
+        base.proposta = {
+          nomeMae: d.nomeMae, sexo: d.sexo, estadoCivil: d.estadoCivil,
+          telefone: d.telefone, email: d.email,
+          contato: { logradouro: d.logradouro, numero: d.numero, complemento: d.complemento, bairro: d.bairro, cidade: d.cidade, cep: d.cep, uf: d.uf },
+          conta: { bank: d.banco, branch: d.agencia, number: d.conta, digit: d.digito, type: d.tipoConta },
+          documento: (d.docTipo && d.docNum && d.docEmissor) ? { tipo: d.docTipo, numero: d.docNum, emissor: d.docEmissor, uf: d.docUf, emissao: '' } : undefined
+        };
+        const res = await postAnexar(base);
+        close();
+        resolve(res);
+      }catch(e){
+        const n = document.createElement('div');
+        n.className = 'ax-msg erro';
+        n.style.marginTop='8px'; n.textContent = 'Erro: '+(e.message||e)+' (pode ter entrado em segundo plano)';
+        $('axModalNote').appendChild(n);
+        setTimeout(()=>{ try{ n.remove(); }catch(_){ } }, 6000);
+      }finally{
+        sendBtn.disabled = false;
+      }
+    };
+  });
 }
 
 document.getElementById('q').addEventListener('input',render);
