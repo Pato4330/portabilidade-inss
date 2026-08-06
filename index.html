@@ -151,6 +151,10 @@ select option:disabled{color:var(--mut)}
 .anexar-row .ax-msg{flex-basis:100%;font-size:11px;color:var(--mut);font-weight:500}
 .anexar-row .ax-msg.ok{color:var(--ok2)}
 .anexar-row .ax-msg.erro{color:#f87171}
+.anexar-bar{display:flex;align-items:center;gap:8px;margin:-4px 0 12px;font-size:12px;color:var(--mut);font-weight:600}
+.anexar-bar input{accent-color:var(--acc)}
+.sc-sel{display:flex;align-items:center;gap:8px;flex:1;min-width:0;cursor:pointer}
+.sc-sel input{accent-color:var(--acc);cursor:pointer}
 .anexar-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:400;display:none;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(2px)}
 .anexar-overlay.open{display:flex}
 .anexar-modal{background:var(--bg2);border:1px solid var(--line);border-radius:18px;max-width:680px;width:100%;max-height:88vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.5);padding:22px}
@@ -711,10 +715,15 @@ function openSidebar(client){
   html += '<div class="inapto-bar"><label><input type="checkbox" id="sbInapto"> Inapto</label>';
   html += '<span class="mvmsg" id="sbInaptoMsg"></span></div>';
   html += '</div>';
-  html += '<div class="sb-section"><h3>Contratos</h3><div class="sb-contracts">';
-  for (const c of client.contracts) {
+  html += '<div class="sb-section"><h3>Contratos</h3>';
+  html += '<div class="anexar-bar"><label><input type="checkbox" id="sbSel"> selecionar todos</label></div>';
+  html += '<div class="sb-contracts">';
+  const cs = client.contracts;
+  for (let i = 0; i < cs.length; i++) {
+    const c = cs[i];
+    const inv = c.erro || c.inapto || !(c.pcNova > 0);
     html += `<div class="sb-contract">
-      <div class="sc-head"><span class="sc-bank">${c.banco}</span><span class="sc-nb">NB ${c.nb}</span></div>
+      <div class="sc-head"><label class="sc-sel"><input type="checkbox" class="sc-sel-chk" data-i="${i}" ${inv ? 'disabled' : ''}> <span class="sc-bank">${c.banco}</span>${c.port_pura ? ' <span class="pp-chip">PORT PURA</span>' : ''}</label><span class="sc-nb">NB ${c.nb}</span></div>
       <div class="sc-grid">
         <div class="sc-item"><div class="sl">Contrato</div><div class="sv">${c.contrato}</div></div>
         <div class="sc-item"><div class="sl">Parcelas</div><div class="sv">${c.rest}/${c.prazo}</div></div>
@@ -733,10 +742,44 @@ function openSidebar(client){
       </div>
     </div>`;
   }
+  html += '</div>';
+  html += '<div class="anexar-row">';
+  html += '<button type="button" class="ax-sim" id="sbSim">&#128228; Anexar simulação</button>';
+  html += '<button type="button" class="ax-prop" id="sbProp">&#128203; Anexar proposta(s)</button>';
+  html += '<span class="ax-msg" id="sbAxMsg"></span>';
   html += '</div></div>';
   document.getElementById('sbBody').innerHTML = html;
   sb.classList.add('open');
   ov.classList.add('open');
+  const axMsg = document.getElementById('sbAxMsg');
+  const selTodos = document.getElementById('sbSel');
+  selTodos.onchange = () => { document.querySelectorAll('.sc-sel-chk').forEach(x => { if(!x.disabled) x.checked = selTodos.checked; }); };
+  const runAx = async (acao, btn) => {
+    if(!session){ axMsg.className='ax-msg erro'; axMsg.textContent='Faça login para anexar.'; return; }
+    const escolhidos = client.contracts.filter((_, i) => {
+      const box = document.querySelector('.sc-sel-chk[data-i="'+i+'"]');
+      return box && !box.disabled && box.checked;
+    });
+    if(!escolhidos.length){ axMsg.className='ax-msg erro'; axMsg.textContent='Selecione ao menos 1 contrato válido.'; return; }
+    btn.disabled = true;
+    axMsg.className='ax-msg'; axMsg.textContent='Anexando '+escolhidos.length+' contrato(s)...';
+    try{
+      const r = await anexarCard(client, acao, axMsg, escolhidos);
+      if(r.ok){
+        axMsg.className='ax-msg ok';
+        axMsg.textContent = acao==='proposta'
+          ? 'Proposta(s) enviada(s) à digitação (status: '+(r.status||'digitando')+').'
+          : 'Simulação anexada no Finanto (rascunho).';
+      }
+    }catch(err){
+      axMsg.className='ax-msg erro';
+      axMsg.textContent='Erro: '+(err.message||err);
+    }finally{
+      btn.disabled=false;
+    }
+  };
+  document.getElementById('sbSim').onclick = () => runAx('simulacao', document.getElementById('sbSim'));
+  document.getElementById('sbProp').onclick = () => runAx('proposta', document.getElementById('sbProp'));
   document.getElementById('sbMv').value = client.equipe || '';
   document.getElementById('sbMv').onchange = e => moverCliente(client.cpf, e.target.value, document.getElementById('sbMvMsg'));
   document.getElementById('sbInapto').checked = client.inapto || false;
@@ -871,12 +914,6 @@ function buildCard(c){
       <label><input type="checkbox" class="inapto-chk"> Inapto</label>
       <span class="mvmsg inapto-msg"></span>
     </div>
-    ${hasAnexar ? `
-    <div class="anexar-row">
-      <button type="button" class="ax-sim" data-ax="simulacao">&#128228; Anexar simulação</button>
-      <button type="button" class="ax-prop" data-ax="proposta">&#128203; Anexar proposta</button>
-      <span class="ax-msg"></span>
-    </div>` : ''}
   </div>`;
   const head = el.querySelector('.phead');
   const tgl  = el.querySelector('.tgl');
@@ -899,29 +936,6 @@ function buildCard(c){
   if(el.classList.contains('inapto')){ el.classList.remove('port-pura'); }
   else if(c.contracts.filter(ct => !ct.erro && !ct.inapto).length > 0 &&
           c.contracts.filter(ct => !ct.erro && !ct.inapto).every(ct => ct.port_pura) && showPortPura()){ el.classList.add('port-pura'); }
-  const axMsg = el.querySelector('.ax-msg');
-  el.querySelectorAll('[data-ax]').forEach(btn => {
-    btn.onclick = async e => {
-      e.stopPropagation();
-      if(!session){ return; }
-      btn.disabled = true;
-      if(axMsg) axMsg.className = 'ax-msg'; axMsg.textContent = 'Anexando...';
-      try{
-        const r = await anexarCard(c, btn.getAttribute('data-ax'), axMsg);
-        if(r.ok){
-          if(axMsg) axMsg.className = 'ax-msg ok';
-          axMsg.textContent = btn.getAttribute('data-ax')==='proposta'
-            ? 'Proposta enviada à digitação no Bank (status: '+(r.status||'digitando')+').'
-            : 'Simulação anexada no Finanto (rascunho).';
-        }
-      }catch(err){
-        if(axMsg) axMsg.className = 'ax-msg erro';
-        axMsg.textContent = 'Erro: '+(err.message||err);
-      }finally{
-        btn.disabled = false;
-      }
-    };
-  });
   head.onclick = e => { if(e.target!==tgl && e.target!==chk) openSidebar(c); };
   tgl.onclick = () => { tgl.closest('.pcard').classList.toggle('open'); };
   return el;
@@ -953,8 +967,11 @@ async function postAnexar(body){
   return j;
 }
 
-function anexarCard(c, acao){
-  const contracts = c.contracts.filter(x => !x.erro && !x.inapto && x.pcNova > 0);
+function anexarCard(c, acao, axMsg, lista){
+  const validos = c.contracts.filter(x => !x.erro && !x.inapto && x.pcNova > 0);
+  const contracts = (lista && lista.length)
+    ? lista.filter(x => !x.erro && !x.inapto && x.pcNova > 0)
+    : validos;
   if(!contracts.length) return Promise.reject(new Error('sem contratos válidos para anexar'));
   const first = contracts[0];
   let saved = {};
