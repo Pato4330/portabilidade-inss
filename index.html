@@ -852,7 +852,7 @@ function buildCard(c){
         <div class="ditem"><div class="l">Taxa</div><div class="v">${tx(ct.txAtual)} → ${tx(ct.txNova)}</div></div>
         <div class="ditem"><div class="l">Parcelas</div><div class="v">${ct.rest}/${ct.prazo}</div></div>
         <div class="ditem"><div class="l">Saldo</div><div class="v">${fmt(ct.saldo)}</div></div>
-        ${ct.port_pura ? `<div class="ditem"><div class="l">Port pura</div><div class="v" style="color:#f59e0b;font-weight:700">Apresentar taxa 1,66%</div></div>` : ''}
+        ${ct.port_pura ? `<div class="ditem"><div class="l">Port pura</div><div class="v" style="color:#f59e0b;font-weight:700">taxa ${tx(ct.txNova)}% · parcela ${fmt(ct.pcNova)} · eco ${fmt(ct.ecoMes)}/mês</div></div>` : ''}
         ${ct.dtcontrato ? `<div class="ditem" style="grid-column:span 2"><div class="l">Início</div><div class="v">${fmtData(ct.dtcontrato)}</div></div>` : ''}
         ${ct.erro ? `<div class="ditem" style="grid-column:span 2;border:1px solid rgba(239,68,68,.4);background:rgba(239,68,68,.08)"><div class="l" style="color:#f87171">Incompatível</div><div class="v" style="color:#f87171;font-size:11px">${ct.erro}</div></div>` : ''}
         ${ct.motivo ? `<div class="ditem" style="grid-column:span 2;border:1px solid rgba(239,68,68,.4);background:rgba(239,68,68,.08)"><div class="l" style="color:#f87171">Motivo</div><div class="v" style="color:#f87171;font-size:11px">${ct.motivo}</div></div>` : ''}
