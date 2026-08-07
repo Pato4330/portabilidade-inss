@@ -1186,8 +1186,8 @@ const PORT_KEY = 'port_pura_portabilidade_v1';
 let showPortPura = () => true;
 (function initPortToggle(){
   const el = document.getElementById('portPuraToggle');
-  let on = true;
-  try{ on = localStorage.getItem(PORT_KEY) !== '0'; }catch(e){}
+  let on = false;
+  try{ on = localStorage.getItem(PORT_KEY) === '1'; }catch(e){}
   el.checked = on;
   showPortPura = () => on;
   el.onchange = () => {
