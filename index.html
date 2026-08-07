@@ -139,6 +139,9 @@ select option:disabled{color:var(--mut)}
 .inapto-bar{display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
 .inapto-bar label{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;gap:5px;cursor:pointer;font-weight:600}
 .inapto-bar input{accent-color:var(--danger);width:16px;height:16px;cursor:pointer}
+.recalc-btn{background:linear-gradient(135deg,var(--acc),var(--acc-deep));border:none;color:#fff;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s}
+.recalc-btn:hover{opacity:.9;transform:translateY(-1px)}
+.recalc-btn:disabled{opacity:.5;cursor:wait;transform:none}
 .ditem.port-pura{border:1.5px solid #f59e0b;background:linear-gradient(180deg,rgba(245,158,11,.12),rgba(var(--panel-rgb),.5))}
 .pp-chip{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:700;letter-spacing:.6px;color:#f59e0b;background:rgba(245,158,11,.12);border:1px solid #f59e0b;border-radius:6px;padding:2px 7px;vertical-align:2px}
 .anexar-row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
@@ -662,6 +665,29 @@ document.getElementById('cpfInput').addEventListener('input', function(){
   this.value = out;
 });
 
+async function recalcularCliente(cpf, msgEl){
+  if(!session){ if(msgEl) msgEl.textContent='faça login'; return; }
+  if(msgEl) msgEl.textContent='calculando no Finanto...';
+  const btn = msgEl && msgEl.closest('.movebar') ? msgEl.closest('.movebar').querySelector('.recalc-btn') : null;
+  if(btn) btn.disabled = true;
+  try{
+    const res = await fetch(CONFIG.funcUrl, {
+      method:'POST',
+      headers: { 'Content-Type':'application/json', 'x-func-key': CONFIG.funcKey, ...(session?{Authorization:'Bearer '+session.access_token}:{}) },
+      body: JSON.stringify({ cpf: String(cpf).replace(/\D/g,''), equipe: currentTeam }),
+      signal: AbortSignal.timeout(150000)
+    });
+    const j = await res.json();
+    if(!res.ok || !j.ok) throw new Error(j.error || 'falha no cálculo');
+    if(msgEl) msgEl.textContent = j.nome + ' — ' + j.total + ' contrato(s) recalculado(s) ✓';
+    await refreshData();
+  }catch(e){
+    if(msgEl) msgEl.textContent = 'erro: '+(e.message||e);
+  }finally{
+    if(btn) btn.disabled = false;
+  }
+}
+
 async function moverCliente(cpf, equipe, msgEl){
   if(!REMOTE){ if(msgEl) msgEl.textContent='sem sincronização online'; return; }
   if(msgEl) msgEl.textContent='movendo...';
@@ -804,23 +830,39 @@ function applyContacted(){
 }
 
 function groupByClient(){
-  const map = new Map();
+  const byCpf = new Map();
   for (const d of DATA) {
-    if (!map.has(d.cpf)) {
-      map.set(d.cpf, { nome: d.nome, cpf: d.cpf, equipe: d.equipe, inapto: d.inapto || false, contracts: [], totalSaldo: 0, totalEcoMes: 0, totalEcoTotal: 0, maxTxAtual: 0, count: 0, countValid: 0 });
+    if (!byCpf.has(d.cpf)) {
+      byCpf.set(d.cpf, { nome: d.nome, cpf: d.cpf, equipe: d.equipe, inapto: d.inapto || false, origins: new Map(), contracts: [], maxTxAtual: 0, count: 0 });
     }
-    const c = map.get(d.cpf);
-    c.contracts.push(d);
-    c.totalSaldo += d.saldo;
-    if (!d.erro) {
-      c.totalEcoMes += d.ecoMes;
-      c.totalEcoTotal += d.ecoTotal;
-      c.countValid++;
+    const g = byCpf.get(d.cpf);
+    const key = (d.banco || '') + '|' + (d.contrato || '') + '|' + (d.nb || '');
+    const valid = !d.erro;
+    const prev = g.origins.get(key);
+    if (!prev || (valid && (!prev.valid || d.ecoMes > prev.ecoMes))) {
+      g.origins.set(key, { saldo: d.saldo, ecoMes: d.ecoMes, ecoTotal: d.ecoTotal, valid, col: d });
     }
-    if (d.txAtual > c.maxTxAtual) c.maxTxAtual = d.txAtual;
-    c.count++;
+    g.contracts.push(d);
+    g.count++;
+    if (d.txAtual > g.maxTxAtual) g.maxTxAtual = d.txAtual;
   }
-  return [...map.values()];
+  return [...byCpf.values()].map(g => {
+    let totalSaldo = 0, totalEcoMes = 0, totalEcoTotal = 0, countValid = 0;
+    for (const o of g.origins.values()) {
+      if (o.valid) {
+        totalSaldo += o.saldo;
+        totalEcoMes += o.ecoMes;
+        totalEcoTotal += o.ecoTotal;
+        countValid++;
+      }
+    }
+    const anyPort = [...g.origins.values()].some(o => o.valid && o.col.port_pura);
+    return {
+      nome: g.nome, cpf: g.cpf, equipe: g.equipe, inapto: g.inapto || false,
+      contracts: g.contracts, totalSaldo, totalEcoMes, totalEcoTotal,
+      maxTxAtual: g.maxTxAtual, count: g.count, countValid, anyPort,
+    };
+  });
 }
 
 let grouped = groupByClient();
@@ -895,6 +937,9 @@ function buildCard(c){
         <div class="ditem"><div class="l">Taxa</div><div class="v">${tx(ct.txAtual)} → ${tx(ct.txNova)}</div></div>
         <div class="ditem"><div class="l">Parcelas</div><div class="v">${ct.rest}/${ct.prazo}</div></div>
         <div class="ditem"><div class="l">Saldo</div><div class="v">${fmt(ct.saldo)}</div></div>
+        ${ct.port_pura
+          ? `<div class="ditem" style="grid-column:span 2;border:1.5px solid #f59e0b"><div class="l" style="color:#f59e0b">Operação</div><div class="v" style="color:#f59e0b;font-weight:700">Portabilidade Pura — mantém o prazo restante (${ct.rest}) e reduz a taxa ao máximo</div></div>`
+          : `<div class="ditem" style="grid-column:span 2"><div class="l">Operação</div><div class="v">Refinanciamento / Port. de refin (${ct.produto || 'port_refin'})</div></div>`}
         ${ct.port_pura ? `<div class="ditem"><div class="l">Port pura</div><div class="v" style="color:#f59e0b;font-weight:700">taxa ${tx(ct.txNova)}% · parcela ${fmt(ct.pcNova)} · eco ${fmt(ct.ecoMes)}/mês</div></div>` : ''}
         ${ct.dtcontrato ? `<div class="ditem" style="grid-column:span 2"><div class="l">Início</div><div class="v">${fmtData(ct.dtcontrato)}</div></div>` : ''}
         ${ct.erro ? `<div class="ditem" style="grid-column:span 2;border:1px solid rgba(239,68,68,.4);background:rgba(239,68,68,.08)"><div class="l" style="color:#f87171">Incompatível</div><div class="v" style="color:#f87171;font-size:11px">${ct.erro}</div></div>` : ''}
@@ -914,6 +959,10 @@ function buildCard(c){
       <label><input type="checkbox" class="inapto-chk"> Inapto</label>
       <span class="mvmsg inapto-msg"></span>
     </div>
+    <div class="movebar" style="border-top:1px dashed var(--line)">
+      <button type="button" class="recalc-btn">&#128260; Recalcular</button>
+      <span class="mvmsg recalc-msg"></span>
+    </div>
   </div>`;
   const head = el.querySelector('.phead');
   const tgl  = el.querySelector('.tgl');
@@ -932,6 +981,9 @@ function buildCard(c){
     await moverInapto(c.cpf, e.target.checked, msg);
     inaptoChk.disabled = false;
   };
+  const recalcBtn = el.querySelector('.recalc-btn');
+  const recMsg = el.querySelector('.recalc-msg');
+  recalcBtn.onclick = e => { e.stopPropagation(); recalcularCliente(c.cpf, recMsg); };
   el.classList.toggle('inapto', c.inapto || false);
   if(el.classList.contains('inapto')){ el.classList.remove('port-pura'); }
   else if(c.contracts.filter(ct => !ct.erro && !ct.inapto).length > 0 &&
@@ -1006,22 +1058,22 @@ function openAnexarProposta(base){
     const $ = id => document.getElementById(id);
     $('axModalSub').textContent = 'Cliente: '+(b.nome||'')+' · CPF '+b.cpf+' · NB '+base.nb+' · anexando '+(base.itens.length)+' contrato(s)';
     $('axModalNote').textContent = 'A proposta será enviada à digitação no Finanto Bank com os cálculos deste card. Os dados do tomador são coletados no momento — o resultado (status) aparece sozinho no card da proposta depois.';
-    $('axMae').value = saved.mae || b.mae || '';
-    $('axTel').value = saved.telefone || '';
-    $('axEmail').value = saved.email || '';
-    $('axSexo').value = (saved.sexo || b.sexo || 'M') === 'F' ? 'F' : 'M';
-    $('axCivil').value = saved.estadoCivil || 'Solteiro';
-    $('axCep').value = saved.cep || end.zipCode || '';
-    $('axRua').value = saved.logradouro || end.address || '';
-    $('axNum').value = saved.numero || '';
-    $('axComp').value = saved.complemento || '';
-    $('axBairro').value = saved.bairro || end.district || '';
-    $('axCidade').value = saved.cidade || end.city || '';
-    $('axUf').value = (saved.uf || b.uf || end.state || '').toUpperCase();
-    $('axBanco').value = saved.banco || (cnt.bankCode||'');
-    $('axAgencia').value = saved.agencia || cnt.agency || '';
-    $('axConta').value = saved.conta || cnt.number || '';
-    $('axDigito').value = saved.digito || '';
+    $('axMae').value = b.mae || saved.mae || '';
+    $('axTel').value = b.telefone || saved.telefone || '';
+    $('axEmail').value = b.email || saved.email || '';
+    $('axSexo').value = ((b.sexo || saved.sexo || 'M') === 'F') ? 'F' : 'M';
+    $('axCivil').value = b.estadoCivil || saved.estadoCivil || 'Solteiro';
+    $('axCep').value = end.zipCode || (b.cep) || saved.cep || '';
+    $('axRua').value = end.address || b.logradouro || saved.logradouro || '';
+    $('axNum').value = b.numero || saved.numero || '';
+    $('axComp').value = b.complemento || saved.complemento || '';
+    $('axBairro').value = end.district || b.bairro || saved.bairro || '';
+    $('axCidade').value = end.city || b.cidade || saved.cidade || '';
+    $('axUf').value = (b.uf || end.state || saved.uf || '').toUpperCase();
+    $('axBanco').value = cnt.bankCode || cnt.bank || b.banco || saved.banco || '';
+    $('axAgencia').value = cnt.agency || cnt.branch || b.agencia || saved.agencia || '';
+    $('axConta').value = cnt.number || cnt.conta || b.conta || saved.conta || '';
+    $('axDigito').value = cnt.digit || b.digito || saved.digito || '';
     $('axTipoConta').value = saved.tipoConta || '1';
     $('axDocTipo').value = saved.docTipo || '';
     $('axDocNum').value = saved.docNum || '';
