@@ -176,6 +176,8 @@ select option:disabled{color:var(--mut)}
 .anexar-modal .fbtns .send{background:linear-gradient(135deg,#f59e0b,#d97706);border:none;color:#1c1000}
 .anexar-modal .fbtns .send:disabled{opacity:.5;cursor:wait}
 .anexar-modal .axnote{font-size:11px;color:var(--mut);margin-top:14px;line-height:1.5}
+    .anexar-modal .axdados{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:10px;padding:9px 10px;border:1px solid rgba(var(--acc-rgb),.35);border-radius:8px;font-size:11.5px;color:var(--txt)}
+    .anexar-modal .axdados .adk{color:var(--mut)}
 .resultsInfo{margin:0 0 12px;font-size:12px;color:var(--mut);font-weight:500}
 .empty{padding:80px;text-align:center;color:var(--mut);font-size:15px}
 footer{margin-top:32px;color:rgba(var(--mut-rgb),.5);font-size:11px;text-align:center;font-weight:500;letter-spacing:.3px}
@@ -373,6 +375,7 @@ footer{margin-top:32px;color:rgba(var(--mut-rgb),.5);font-size:11px;text-align:c
   <div class="anexar-modal">
     <h3>Anexar proposta no Finanto</h3>
     <div class="sub" id="axModalSub"></div>
+    <div class="axdados" id="axDadosBenef"></div>
     <div class="fgrid">
       <div class="fcol"><label>Nome da mãe</label><input id="axMae" placeholder="Nome da mãe"></div>
       <div class="fcol"><label>Telefone</label><input id="axTel" placeholder="(00) 00000-0000"></div>
@@ -1012,6 +1015,12 @@ function openAnexarProposta(base){
     const saved = axGet();
     const $ = id => document.getElementById(id);
     $('axModalSub').textContent = 'Cliente: '+(b.nome||'')+' · CPF '+b.cpf+' · NB '+base.nb+' · anexando '+(base.itens.length)+' contrato(s)';
+    const ddB = [['Nascimento', b.nascimento||''], ['Tipo benefício', b.tipo||''], ['Concessão', b.dc||''], ['UF', (b.uf||'').toUpperCase()]];
+    if (Number(b.valorBeneficio||0) > 0) ddB.push(['Valor', fmt(Number(b.valorBeneficio))]);
+    const ddBfilt = ddB.filter(p=>p[1]);
+    $('axDadosBenef').innerHTML = ddBf.length
+      ? '<span style="font-size:11px;color:var(--mut);font-weight:600;text-transform:uppercase;letter-spacing:.4px">Dados do tomador</span>' + ddBf.map(([k,v])=>`<span class="adk">${k}: <b>${v}</b></span>`).join('')
+      : '';
     $('axModalNote').textContent = 'A proposta será enviada à digitação no Finanto Bank com os cálculos deste card. Os dados do tomador são coletados no momento — o resultado (status) aparece sozinho no card da proposta depois.';
     $('axMae').value = b.mae || saved.mae || '';
     $('axTel').value = b.telefone || saved.telefone || '';
