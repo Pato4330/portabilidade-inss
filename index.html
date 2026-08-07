@@ -144,6 +144,7 @@ select option:disabled{color:var(--mut)}
 .recalc-btn:disabled{opacity:.5;cursor:wait;transform:none}
 .ditem.port-pura{border:1.5px solid #f59e0b;background:linear-gradient(180deg,rgba(245,158,11,.12),rgba(var(--panel-rgb),.5))}
 .pp-chip{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:700;letter-spacing:.6px;color:#f59e0b;background:rgba(245,158,11,.12);border:1px solid #f59e0b;border-radius:6px;padding:2px 7px;vertical-align:2px}
+.pp-chip.ref{color:var(--mut);background:rgba(var(--panel-rgb),.6);border-color:rgba(var(--line-rgb),.4)}
 .anexar-row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
 .anexar-row button{flex:1;min-width:130px;border-radius:var(--radius-sm);padding:9px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s}
 .anexar-row .ax-sim{background:var(--okbg);border:1px solid var(--okline);color:var(--ok2)}
@@ -741,6 +742,12 @@ function openSidebar(client){
   html += '<div class="inapto-bar"><label><input type="checkbox" id="sbInapto"> Inapto</label>';
   html += '<span class="mvmsg" id="sbInaptoMsg"></span></div>';
   html += '</div>';
+  html += '<div class="sb-section"><h3>Resumo</h3>';
+  html += '<div class="sb-row"><span class="lbl">Saldo total</span><span class="val">'+fmt(client.totalSaldo)+'</span></div>';
+  html += '<div class="sb-row"><span class="lbl">Economia/mês</span><span class="val" style="color:var(--ok2)">'+fmt(client.totalEcoMes)+'</span></div>';
+  html += '<div class="sb-row"><span class="lbl">Economia total</span><span class="val" style="color:var(--ok2)">'+fmt(client.totalEcoTotal)+'</span></div>';
+  html += '<div class="movebar" style="border-top:none"><button type="button" class="recalc-btn" id="sbRecalc">&#128260; Recalcular cliente</button><span class="mvmsg" id="sbRecalcMsg"></span></div>';
+  html += '</div>';
   html += '<div class="sb-section"><h3>Contratos</h3>';
   html += '<div class="anexar-bar"><label><input type="checkbox" id="sbSel"> selecionar todos</label></div>';
   html += '<div class="sb-contracts">';
@@ -749,7 +756,7 @@ function openSidebar(client){
     const c = cs[i];
     const inv = c.erro || c.inapto || !(c.pcNova > 0);
     html += `<div class="sb-contract">
-      <div class="sc-head"><label class="sc-sel"><input type="checkbox" class="sc-sel-chk" data-i="${i}" ${inv ? 'disabled' : ''}> <span class="sc-bank">${c.banco}</span>${c.port_pura ? ' <span class="pp-chip">PORT PURA</span>' : ''}</label><span class="sc-nb">NB ${c.nb}</span></div>
+      <div class="sc-head"><label class="sc-sel"><input type="checkbox" class="sc-sel-chk" data-i="${i}" ${inv ? 'disabled' : ''}> <span class="sc-bank">${c.banco}</span>${c.port_pura ? ' <span class="pp-chip">PORT PURA</span>' : ' <span class="pp-chip ref">REFIN</span>'}</label><span class="sc-nb">NB ${c.nb}</span></div>
       <div class="sc-grid">
         <div class="sc-item"><div class="sl">Contrato</div><div class="sv">${c.contrato}</div></div>
         <div class="sc-item"><div class="sl">Parcelas</div><div class="sv">${c.rest}/${c.prazo}</div></div>
@@ -810,6 +817,7 @@ function openSidebar(client){
   document.getElementById('sbMv').onchange = e => moverCliente(client.cpf, e.target.value, document.getElementById('sbMvMsg'));
   document.getElementById('sbInapto').checked = client.inapto || false;
   document.getElementById('sbInapto').onchange = e => moverInapto(client.cpf, e.target.checked, document.getElementById('sbInaptoMsg'));
+  document.getElementById('sbRecalc').onclick = () => recalcularCliente(client.cpf, document.getElementById('sbRecalcMsg'));
 }
 
 function closeSidebar(){
@@ -909,8 +917,6 @@ function buildCard(c){
   el.dataset.cpf = c.cpf;
   const tag = c.equipe ? `<span class="teamTag ${c.equipe==='Leda'?'tagLeda':'tagFlavia'}">${c.equipe}</span>` :
               `<span class="teamTag tagNone">sem equipe</span>`;
-  const valid = c.contracts.filter(ct => !ct.erro && !ct.inapto && ct.pcNova > 0);
-  const hasAnexar = valid.length > 0;
   el.innerHTML = `
   <div class="phead">
     <div class="row1">
@@ -919,7 +925,6 @@ function buildCard(c){
         <div class="nome">${c.nome}${tag}</div>
         <div class="sub">CPF ${c.cpf} · ${c.count} contrato(s)${c.countValid < c.count ? ' · '+c.countValid+' válido(s)' : ''}</div>
       </div>
-      <button class="tgl" aria-label="Detalhes">&#9660;</button>
     </div>
     <div class="row2">
       <div class="mcol"><div class="lbl">Saldo total</div><div class="mval">${fmt(c.totalSaldo)}</div></div>
@@ -929,67 +934,14 @@ function buildCard(c){
     <div class="row3">
       <div class="ecobadge"><span class="l">Economia total</span>${fmt(c.totalEcoTotal)}</div>
     </div>
-  </div>
-  <div class="pdetails">
-    <div class="dgrid">
-      ${c.contracts.map(ct => `
-        <div class="ditem ${ct.port_pura ? 'port-pura' : ''}"><div class="l">${ct.banco} · NB ${ct.nb}${ct.port_pura ? ' <span class="pp-chip">PORT PURA</span>' : ''}</div><div class="v">${ct.contrato}</div></div>
-        <div class="ditem"><div class="l">Taxa</div><div class="v">${tx(ct.txAtual)} → ${tx(ct.txNova)}</div></div>
-        <div class="ditem"><div class="l">Parcelas</div><div class="v">${ct.rest}/${ct.prazo}</div></div>
-        <div class="ditem"><div class="l">Saldo</div><div class="v">${fmt(ct.saldo)}</div></div>
-        ${ct.port_pura
-          ? `<div class="ditem" style="grid-column:span 2;border:1.5px solid #f59e0b"><div class="l" style="color:#f59e0b">Operação</div><div class="v" style="color:#f59e0b;font-weight:700">Portabilidade Pura — mantém o prazo restante (${ct.rest}) e reduz a taxa ao máximo</div></div>`
-          : `<div class="ditem" style="grid-column:span 2"><div class="l">Operação</div><div class="v">Refinanciamento / Port. de refin (${ct.produto || 'port_refin'})</div></div>`}
-        ${ct.port_pura ? `<div class="ditem"><div class="l">Port pura</div><div class="v" style="color:#f59e0b;font-weight:700">taxa ${tx(ct.txNova)}% · parcela ${fmt(ct.pcNova)} · eco ${fmt(ct.ecoMes)}/mês</div></div>` : ''}
-        ${ct.dtcontrato ? `<div class="ditem" style="grid-column:span 2"><div class="l">Início</div><div class="v">${fmtData(ct.dtcontrato)}</div></div>` : ''}
-        ${ct.erro ? `<div class="ditem" style="grid-column:span 2;border:1px solid rgba(239,68,68,.4);background:rgba(239,68,68,.08)"><div class="l" style="color:#f87171">Incompatível</div><div class="v" style="color:#f87171;font-size:11px">${ct.erro}</div></div>` : ''}
-        ${ct.motivo ? `<div class="ditem" style="grid-column:span 2;border:1px solid rgba(239,68,68,.4);background:rgba(239,68,68,.08)"><div class="l" style="color:#f87171">Motivo</div><div class="v" style="color:#f87171;font-size:11px">${ct.motivo}</div></div>` : ''}
-      `).join('')}
-    </div>
-    <div class="movebar">
-      <label>Mover cliente para:</label>
-      <select class="mv">
-        <option value="">— sem equipe —</option>
-        <option value="Flavia">Flávia</option>
-        <option value="Leda">Leda</option>
-      </select>
-      <span class="mvmsg"></span>
-    </div>
-    <div class="inapto-bar">
-      <label><input type="checkbox" class="inapto-chk"> Inapto</label>
-      <span class="mvmsg inapto-msg"></span>
-    </div>
-    <div class="movebar" style="border-top:1px dashed var(--line)">
-      <button type="button" class="recalc-btn">&#128260; Recalcular</button>
-      <span class="mvmsg recalc-msg"></span>
-    </div>
   </div>`;
-  const head = el.querySelector('.phead');
-  const tgl  = el.querySelector('.tgl');
-  const chk  = el.querySelector('.chk');
-  const mv   = el.querySelector('.mv');
-  const inaptoChk = el.querySelector('.inapto-chk');
+  const chk = el.querySelector('.chk');
   chk.onchange = e => { e.stopPropagation(); toggleContact(c.cpf, e.target.checked); };
   chk.onclick = e => e.stopPropagation();
-  mv.value = c.equipe || '';
-  mv.onchange = e => moverCliente(c.cpf, e.target.value, el.querySelector('.mvmsg'));
-  inaptoChk.checked = c.inapto || false;
-  inaptoChk.onchange = async e => {
-    inaptoChk.disabled = true;
-    const msg = el.querySelector('.inapto-msg');
-    if(msg) msg.textContent = 'salvando...';
-    await moverInapto(c.cpf, e.target.checked, msg);
-    inaptoChk.disabled = false;
-  };
-  const recalcBtn = el.querySelector('.recalc-btn');
-  const recMsg = el.querySelector('.recalc-msg');
-  recalcBtn.onclick = e => { e.stopPropagation(); recalcularCliente(c.cpf, recMsg); };
   el.classList.toggle('inapto', c.inapto || false);
   if(el.classList.contains('inapto')){ el.classList.remove('port-pura'); }
-  else if(c.contracts.filter(ct => !ct.erro && !ct.inapto).length > 0 &&
-          c.contracts.filter(ct => !ct.erro && !ct.inapto).every(ct => ct.port_pura) && showPortPura()){ el.classList.add('port-pura'); }
-  head.onclick = e => { if(e.target!==tgl && e.target!==chk) openSidebar(c); };
-  tgl.onclick = () => { tgl.closest('.pcard').classList.toggle('open'); };
+  else if(c.anyPort && showPortPura()){ el.classList.add('port-pura'); }
+  el.querySelector('.phead').onclick = e => { if(e.target!==chk) openSidebar(c); };
   return el;
 }
 
