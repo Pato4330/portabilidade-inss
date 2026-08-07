@@ -839,7 +839,7 @@ function groupByClient(){
     const key = (d.banco || '') + '|' + (d.contrato || '') + '|' + (d.nb || '');
     const valid = !d.erro;
     const prev = g.origins.get(key);
-    if (!prev || (valid && (!prev.valid || d.ecoMes > prev.ecoMes))) {
+    if (!prev || (valid && (!prev.valid || (prev.col.port_pura !== d.port_pura && d.port_pura) || (prev.col.port_pura === d.port_pura && d.ecoMes > prev.ecoMes)))) {
       g.origins.set(key, { saldo: d.saldo, ecoMes: d.ecoMes, ecoTotal: d.ecoTotal, valid, col: d });
     }
     g.contracts.push(d);
