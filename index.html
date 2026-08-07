@@ -479,6 +479,8 @@ function norm(d){
     dtcontrato: d.dtcontrato||'', erro: d.erro||'', motivo: d.motivo||'', nascimento: d.nascimento||'',
     tipo: d.tipo||'', dc: d.dc||'', uf: d.uf||'', mae: d.mae||'',
     produto: d.produto||'port_refin', ruleId: d.rule_id||'',
+    port_pura: !!(d.port_pura || d.produto==='portabilidade'),
+    troco: Number(d.troco)||0,
     tabelaNome: d.tabela_nome||'', tabelaCodigo: d.tabela_codigo||'',
     bankOperationCode: Number(d.bank_operation_code)||0,
     contratoOrigem: (function(){ try{ return typeof d.contrato_origem==='string' ? JSON.parse(d.contrato_origem) : (d.contrato_origem||null); }catch(e){ return null; } })(),
@@ -764,6 +766,7 @@ function openSidebar(client){
         <div class="sc-item"><div class="sl">Taxa nova</div><div class="sv">${tx(c.txNova)}</div></div>
         <div class="sc-item"><div class="sl">Saldo</div><div class="sv">${fmt(c.saldo)}</div></div>
         <div class="sc-item"><div class="sl">Parcela atual</div><div class="sv">${fmt(c.pcAtual)}</div></div>
+        ${!c.port_pura ? `<div class="sc-item"><div class="sl">Troco/liberar</div><div class="sv" style="color:var(--ok2)">${fmt(c.troco)}</div></div>` : ''}
         ${c.dtcontrato ? `<div class="sc-item" style="grid-column:span 2"><div class="sl">Início</div><div class="sv">${fmtData(c.dtcontrato)}</div></div>` : ''}
       </div>
       ${c.erro ? `<div style="margin-top:8px;padding:8px 10px;border:1px solid rgba(239,68,68,.4);background:rgba(239,68,68,.08);border-radius:8px;font-size:11px;color:#f87171"><b>Incompatível:</b> ${c.erro}</div>` : ''}
