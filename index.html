@@ -1031,8 +1031,8 @@ function openAnexarProposta(base){
     const ddB = [['Nascimento', b.nascimento||''], ['Tipo benefício', b.tipo||''], ['Concessão', b.dc||''], ['UF', (b.uf||'').toUpperCase()]];
     if (Number(b.valorBeneficio||0) > 0) ddB.push(['Valor', fmt(Number(b.valorBeneficio))]);
     const ddBfilt = ddB.filter(p=>p[1]);
-    $('axDadosBenef').innerHTML = ddBf.length
-      ? '<span style="font-size:11px;color:var(--mut);font-weight:600;text-transform:uppercase;letter-spacing:.4px">Dados do tomador</span>' + ddBf.map(([k,v])=>`<span class="adk">${k}: <b>${v}</b></span>`).join('')
+    $('axDadosBenef').innerHTML = ddBfilt.length
+      ? '<span style="font-size:11px;color:var(--mut);font-weight:600;text-transform:uppercase;letter-spacing:.4px">Dados do tomador</span>' + ddBfilt.map(([k,v])=>`<span class="adk">${k}: <b>${v}</b></span>`).join('')
       : '';
     $('axModalNote').textContent = 'A proposta será enviada à digitação no Finanto Bank com os cálculos deste card. Os dados do tomador são coletados no momento — o resultado (status) aparece sozinho no card da proposta depois.';
     $('axMae').value = b.mae || saved.mae || '';
