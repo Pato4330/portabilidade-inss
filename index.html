@@ -602,6 +602,7 @@ async function buscarCliente(){
     const j = await res.json();
     if(!res.ok || !j.ok) throw new Error(j.error||'falha na consulta');
     lastSearch = { cpf: j.cpf, valor: valor, contratos: j.contratos };
+    if (j.tomador) saveTomador(j.cpf, j.tomador, j.nome);
     document.getElementById('cpfConfirmInfo').innerHTML =
       '<div class="ccName">'+j.nome+'</div>' +
       '<div class="ccSub">CPF '+j.cpf+' · '+j.total+' contrato(s) encontrado(s)</div>';
@@ -958,6 +959,18 @@ function axGet(){
 function axSet(o){
   try{ localStorage.setItem(AXDATA_KEY, JSON.stringify(o)); }catch(e){}
 }
+function saveTomador(cpf, t, nome){
+  try{
+    const prev = JSON.parse(localStorage.getItem('anexar_beneficio_'+cpf)||'{}');
+    const val = Object.assign({}, prev, {
+      nome, cpf,
+      telefone: t.telefone || '', email: t.email || '', mae: t.mae || '',
+      nascimento: t.nascimento || '', sexo: t.sexo || '',
+      endereco: t.endereco || {},
+    });
+    localStorage.setItem('anexar_beneficio_'+cpf, JSON.stringify(val));
+  }catch(e){/* ignora */}
+}
 async function postAnexar(body){
   let res = await fetch(CONFIG.anexarUrl, {
     method:'POST',
@@ -1060,6 +1073,21 @@ function openAnexarProposta(base){
     ov.onclick = e => { if(e.target===ov){ axSet(readForm()); close(); resolve(null); } };
     sendBtn.onclick = async () => {
       const d = readForm();
+      const obrig = [
+        ['Nome da mãe', 'axMae'], ['Telefone', 'axTel'],
+        ['CEP', 'axCep'], ['Logradouro', 'axRua'], ['Número', 'axNum'], ['Bairro', 'axBairro'],
+        ['Cidade', 'axCidade'], ['UF', 'axUf'],
+        ['Banco', 'axBanco'], ['Agência', 'axAgencia'], ['Nº da conta', 'axConta'], ['Dígito', 'axDigito'],
+      ].filter(([, id]) => !String($(id).value.trim()));
+      if (obrig.length) {
+        const n = document.createElement('div');
+        n.className = 'ax-msg erro';
+        n.style.marginTop = '8px';
+        n.textContent = 'Preencha os campos obrigatórios antes de enviar: ' + obrig.map(o => o[0]).join(', ') + '.';
+        $('axModalNote').appendChild(n);
+        setTimeout(() => { try { n.remove(); } catch (_) { } }, 6000);
+        return;
+      }
       axSet(d);
       sendBtn.disabled = true;
       try{
